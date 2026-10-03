@@ -420,7 +420,10 @@ module.exports = { GLOBAL_EVENTS: [
       "ru": "Зверь отступает с арены."
     },
     "boss": {
-      "name": "Зверь",
+      "name": {
+        "en": "The Beast",
+        "ru": "Зверь"
+      },
       "emoji": "👹",
       "count": 1,
       "attributes": {
@@ -450,10 +453,19 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "endless",
       "value": 1
     },
-    "tpl": "Однажды мы всем задаём этот вопрос. Откуда мы взялись? Получившие от кого-то жизнь и безответственно оставленные без присмотра.",
-    "endTpl": "Жизнь есть страдание.",
+    "tpl": {
+      "en": "One day, a question crossed through my mind. Where do we come from? We were given life and left in this world against our own volition.",
+      "ru": "Однажды мы всем задаём этот вопрос. Откуда мы взялись? Получившие от кого-то жизнь и безответственно оставленные без присмотра."
+    },
+    "endTpl": {
+      "en": "To live was a process full of pain.",
+      "ru": "Жизнь есть страдание."
+    },
     "boss": {
-      "name": "Сомнение",
+      "name": {
+        "en": "Doubt",
+        "ru": "Сомнение"
+      },
       "emoji": "🤖",
       "count": 5,
       "attributes": {
@@ -479,7 +491,7 @@ module.exports = { GLOBAL_EVENTS: [
     },
     "enabled": true,
     "script": {
-      "onDamage": "const target = damage.target\n\nif (target && !target.maxHealth && damage.cause === \"boss\") {\n    const health = target.attributes.health;\n\n    if (health === 0) {\n        for (const id of Object.keys(g.boss.participants || {})) {\n            const t = byId(id);\n            if (t && isAlive(t) && t.id !== target.id) { add(t, \"morale\", -6); log(t.name + \" замечает как робот потрошит труп \" + target.name + \"!\"); }\n        }\n    }\n}"
+      "onDamage": "const target = damage.target\n\nif (target && !target.maxHealth && damage.cause === \"boss\") {\n    const health = target.attributes.health;\n\n    if (health === 0) {\n        for (const id of Object.keys(g.boss.participants || {})) {\n            const t = byId(id);\n            if (t && isAlive(t) && t.id !== target.id) { add(t, \"morale\", -6); log(t.name + \" notices the robot gutting the corpse of \" + target.name + \"!\"); }\n        }\n    }\n}"
     }
   },
   {
@@ -491,10 +503,19 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "endless",
       "value": 1
     },
-    "tpl": "Переваренная пища, абсолютно взаимозаменяема.",
-    "endTpl": "Чтобы жить, мы ели без конца. Неизбежное истощение, мусор...",
+    "tpl": {
+      "en": "A perfect meal, an excellent substitute.",
+      "ru": "Переваренная пища, абсолютно взаимозаменяема."
+    },
+    "endTpl": {
+      "en": "We ate incessantly to live. The inevitable diminution, the waste...",
+      "ru": "Чтобы жить, мы ели без конца. Неизбежное истощение, мусор..."
+    },
     "boss": {
-      "name": "Переваренная пища",
+      "name": {
+        "en": "The Perfect Meal",
+        "ru": "Переваренная пища"
+      },
       "emoji": "🪱",
       "count": 16,
       "attributes": {
@@ -529,10 +550,19 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "full_days",
       "value": 3
     },
-    "tpl": "Давайте зажжём в жизни яркое пламя, словно свечу, что однажды погаснет.",
-    "endTpl": "Жизнь означает желание.",
+    "tpl": {
+      "en": "Let us light a flame yet more radiant in our lives; for life is a candlelight, destined to snuff out one day.",
+      "ru": "Давайте зажжём в жизни яркое пламя, словно свечу, что однажды погаснет."
+    },
+    "endTpl": {
+      "en": "To live is to yearn and fight for our desires.",
+      "ru": "Жизнь означает желание."
+    },
     "boss": {
-      "name": "Аплодисменты",
+      "name": {
+        "en": "The Cheers for the Beginning",
+        "ru": "Аплодисменты"
+      },
       "emoji": "🤡",
       "count": 6,
       "attributes": {
@@ -550,7 +580,7 @@ module.exports = { GLOBAL_EVENTS: [
       "weapons": []
     },
     "script": {
-      "onDamage": "if (damage.target && damage.target.maxHealth) {   // a hunter hit the Boss\n  const prev = memory.lastSquad;                  // count before this hit\n  memory.lastSquad = damage.remainingCount;       // remember the new count\nif (prev != null && damage.remainingCount < prev) {\n  for (const id of Object.keys(g.boss.participants || {})) {\n    const t = byId(id);\n    if (t && isAlive(t)) { add(t, \"health\", -rand(10, 15)); log(t.name + \" задевается взрывом!\"); }\n  }\n}\n}"
+      "onDamage": "if (damage.target && damage.target.maxHealth) {   // a hunter hit the Boss\n  const prev = memory.lastSquad;                  // count before this hit\n  memory.lastSquad = damage.remainingCount;       // remember the new count\nif (prev != null && damage.remainingCount < prev) {\n  for (const id of Object.keys(g.boss.participants || {})) {\n    const t = byId(id);\n    if (t && isAlive(t)) { add(t, \"health\", -rand(10, 15)); log(t.name + \" is caught in the blast!\"); }\n  }\n}\n}"
     },
     "enabled": true
   },
@@ -563,10 +593,19 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "endless",
       "value": 1
     },
-    "tpl": "В конце концов, они связаны жизнью. Мы всего лишь отбросили отчанье и гнев.",
-    "endTpl": "Мы познаем что есть жизнь и душа своими силами.",
+    "tpl": {
+      "en": "In the end, they are bound by life. We merely cast off despair and anger.",
+      "ru": "В конце концов, они связаны жизнью. Мы всего лишь отбросили отчанье и гнев."
+    },
+    "endTpl": {
+      "en": "We learn what life and soul are by our own efforts.",
+      "ru": "Мы познаем что есть жизнь и душа своими силами."
+    },
     "boss": {
-      "name": "Процесс понимания",
+      "name": {
+        "en": "The Process of Understanding",
+        "ru": "Процесс понимания"
+      },
       "emoji": "🤖",
       "count": 5,
       "attributes": {
@@ -609,10 +648,19 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "nights",
       "value": 3
     },
-    "tpl": "Когда ночь наступает в тёмном закоулке, приходят они.",
-    "endTpl": "Когда настанет рассвет, ничего уже не останется.",
+    "tpl": {
+      "en": "When night falls in the Backstreets, they will come.",
+      "ru": "Когда ночь наступает в тёмном закоулке, приходят они."
+    },
+    "endTpl": {
+      "en": "When the sun rise up, there will be no remains anymore.",
+      "ru": "Когда настанет рассвет, ничего уже не останется."
+    },
     "boss": {
-      "name": "Чистильщик",
+      "name": {
+        "en": "Sweeper",
+        "ru": "Чистильщик"
+      },
       "emoji": "🧹",
       "count": 12,
       "attributes": {
@@ -656,8 +704,14 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "endless",
       "value": 1
     },
-    "tpl": "Лишь низкие поступки были услышаны нами, и мы добивались милосердия и любви к ним.",
-    "endTpl": "Мы не сможем понять их, как и они не смогут понять нас.",
+    "tpl": {
+      "en": "We could only hear the weakest and faintest of their acts. We sought for love and compassion from them.",
+      "ru": "Лишь низкие поступки были услышаны нами, и мы добивались милосердия и любви к ним."
+    },
+    "endTpl": {
+      "en": "We can not understand them, nor will they understand us.",
+      "ru": "Мы не сможем понять их, как и они не смогут понять нас."
+    },
     "mods": {
       "nerf": {
         "morale": 10,
@@ -665,7 +719,10 @@ module.exports = { GLOBAL_EVENTS: [
       }
     },
     "boss": {
-      "name": "Великая любовь к нам",
+      "name": {
+        "en": "Grant Us Love",
+        "ru": "Великая любовь к нам"
+      },
       "emoji": "🪨",
       "count": 6,
       "attributes": {
@@ -689,7 +746,10 @@ module.exports = { GLOBAL_EVENTS: [
     "replace": {
       "day": [
         {
-          "tpl": "Монолиты начинают светится и {self} и {others} становится плохо.",
+          "tpl": {
+            "en": "The monoliths begin to glow and {self} and {others} feel sick.",
+            "ru": "Монолиты начинают светится и {self} и {others} становится плохо."
+          },
           "targets": [
             1,
             4
@@ -710,7 +770,10 @@ module.exports = { GLOBAL_EVENTS: [
       ],
       "night": [
         {
-          "tpl": "Монолиты начинают светится и {self} и {others} становится плохо.",
+          "tpl": {
+            "en": "The monoliths begin to glow and {self} and {others} feel sick.",
+            "ru": "Монолиты начинают светится и {self} и {others} становится плохо."
+          },
           "targets": [
             1,
             4
@@ -731,9 +794,9 @@ module.exports = { GLOBAL_EVENTS: [
       ]
     },
     "script": {
-      "onStart": "if (Math.random() < 0.5) {\n  const n = rand(1, 3);                 // random group size between 1 and 3\n  const pool = state.tributes.filter(isAlive).slice();\n  const targets = [];\n  while (targets.length < n && pool.length) {\n    targets.push(pool.splice(rand(0, pool.length - 1), 1)[0]); // draw without repeats\n  }\n\n  for (const target of targets) {\n    add(target, \"health\", -100);            // 100 HP damage\n    log(target.name + \" был раздавлен Монолитом!\");\n  }\n}",
-      "onDay": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" становится плохо от сияния Монолитов.\");\n}",
-      "onNight": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" становится плохо от сияния Монолитов.\");\n}"
+      "onStart": "if (Math.random() < 0.5) {\n  const n = rand(1, 3);                 // random group size between 1 and 3\n  const pool = state.tributes.filter(isAlive).slice();\n  const targets = [];\n  while (targets.length < n && pool.length) {\n    targets.push(pool.splice(rand(0, pool.length - 1), 1)[0]); // draw without repeats\n  }\n\n  for (const target of targets) {\n    add(target, \"health\", -100);            // 100 HP damage\n    log(target.name + \" was crushed by the Monolith!\");\n  }\n}",
+      "onDay": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" feels sick from the glow of the Monoliths.\");\n}",
+      "onNight": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" feels sick from the glow of the Monoliths.\");\n}"
     },
     "enabled": true
   },
@@ -746,10 +809,19 @@ module.exports = { GLOBAL_EVENTS: [
       "type": "endless",
       "value": 1
     },
-    "tpl": "Наше шествие не кончается и мы делимся нашей радостью.",
-    "endTpl": "Мы принимаем все удары жизни и саму жизнь, гармонию плоти и более прекрасные отличия.",
+    "tpl": {
+      "en": "We marched from time to time, and we would share our pleasure.",
+      "ru": "Наше шествие не кончается и мы делимся нашей радостью."
+    },
+    "endTpl": {
+      "en": "The collision of one life with another, skin harmonizing, painting a yet more beatiful appearance.",
+      "ru": "Мы принимаем все удары жизни и саму жизнь, гармонию плоти и более прекрасные отличия."
+    },
     "boss": {
-      "name": "Гармония кожи",
+      "name": {
+        "en": "The Harmony of Skin",
+        "ru": "Гармония кожи"
+      },
       "emoji": "🤡",
       "count": 1,
       "attributes": {
@@ -783,7 +855,7 @@ module.exports = { GLOBAL_EVENTS: [
     },
     "enabled": true,
     "script": {
-      "onSlay": "for (let i = 0; i < 3; i++) {\n  triggerGlobal('crimson_dawn');\n  log(bossName() + ' разделяется на три Аплодисмента!');\n}"
+      "onSlay": "for (let i = 0; i < 3; i++) {\n  triggerGlobal('crimson_dawn');\n  log(bossName() + ' splits into three Applauses!');\n}"
     }
   }
 ] };

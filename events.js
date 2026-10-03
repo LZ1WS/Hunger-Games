@@ -873,9 +873,18 @@ module.exports = { POOL: [
     "subs": [
       {
         "tpl": [
-          "{other} замечает {self} во время разведки. {self} замирает за бревном, но тот выходит на него.",
-          "Шорох. {self} замирает, когда {other} выходит на него.",
-          "{self} прячется за стволом, затаив дыхание, но шаги {other} приближаются."
+          {
+            "en": "{other} spots {self} while scouting. {self} freezes behind a log, but {other} closes in.",
+            "ru": "{other} замечает {self} во время разведки. {self} замирает за бревном, но тот выходит на него."
+          },
+          {
+            "en": "A rustle. {self} freezes as {other} closes in on them.",
+            "ru": "Шорох. {self} замирает, когда {other} выходит на него."
+          },
+          {
+            "en": "{self} hides behind a trunk, holding their breath, but {other}'s footsteps draw nearer.",
+            "ru": "{self} прячется за стволом, затаив дыхание, но шаги {other} приближаются."
+          }
         ],
         "targets": 2,
         "weight": 50,
@@ -883,9 +892,18 @@ module.exports = { POOL: [
       },
       {
         "tpl": [
-          "{other} едва не замечает {self} во время разведки. {self} замирает за бревном, пока тот не пройдёт.",
-          "Шорох. {self} замирает, когда {other} проходит на расстоянии вытянутой руки.",
-          "{self} прячется за стволом, затаив дыхание, пока шаги {other} не стихнут."
+          {
+            "en": "{other} almost spots {self} while scouting. {self} freezes behind a log until {other} passes.",
+            "ru": "{other} едва не замечает {self} во время разведки. {self} замирает за бревном, пока тот не пройдёт."
+          },
+          {
+            "en": "A rustle. {self} freezes as {other} passes within arm's reach.",
+            "ru": "Шорох. {self} замирает, когда {other} проходит на расстоянии вытянутой руки."
+          },
+          {
+            "en": "{self} ducks behind a trunk, holding their breath until {other}'s footsteps fade.",
+            "ru": "{self} прячется за стволом, затаив дыхание, пока шаги {other} не стихнут."
+          }
         ],
         "targets": 2,
         "weight": 50
