@@ -54,11 +54,19 @@ items.js etc.    Fallback seed data used when config JSON is missing/broken
 
 ## Security warning
 
-This is a **single-user local tool**. There is **no authentication**, and the API intentionally supports **arbitrary script execution** (the "code editor" feature — events/globals can run user-authored JS via `new Function`). Anyone who can reach the HTTP port can create events with scripts, meaning **remote code execution on your machine**.
+This is a **single-user local tool**. There is **no authentication**, and the API intentionally supports **script execution** (the "code editor" feature — events/globals can run user-authored JS). Anyone who can reach the HTTP port can create events with scripts.
+
+Hardening in place:
+
+- Scripts run inside a [`node:vm`](https://nodejs.org/api/vm.html) sandbox with a 1s timeout. Node globals (`process`, `require`, `Buffer`, …) are **not** exposed — the previous `new Function` escape route (`process.mainModule.require`) is blocked, and runaway loops are killed.
+- The server binds to `127.0.0.1` by default, so it is not reachable from the network.
+
+Caveats — `node:vm` is **not a security boundary** (documented escape techniques exist), so this is defense-in-depth, not protection against determined hostile content:
 
 - Never expose the server to the internet or an untrusted network.
 - The default loopback bind (`127.0.0.1`) is deliberate. Keep it.
 - Do not run it with `HOST=0.0.0.0` unless the machine is fully trusted and firewalled.
+- Do not load content packs or event files from people you don't trust.
 
 ## License
 

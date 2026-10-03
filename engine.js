@@ -1,5 +1,6 @@
 ﻿const fs = require("fs");
 const path = require("path");
+const vm = require("vm");
 const { ITEMS: DEFAULT_ITEMS } = require("./items");
 const { POOL: DEFAULT_POOL } = require("./events");
 const { GLOBAL_EVENTS: DEFAULT_GLOBALS } = require("./globalEvents");
@@ -1052,11 +1053,14 @@ function pickTributeByTarget(state, spec, excludeId) {
 
 // ---------- script hooks ----------
 
+const SCRIPT_TIMEOUT = 1000;
+
 function runScript(src, ctx) {
   if (typeof src !== "string" || !src.trim()) return;
   try {
-    const fn = new Function("ctx", "with (ctx) { " + src + " }");
-    fn(ctx);
+    const sandbox = Object.assign({}, ctx);
+    const context = vm.createContext(sandbox);
+    vm.runInContext(src, context, { timeout: SCRIPT_TIMEOUT, filename: "script.js" });
   } catch (e) {
     if (ctx && ctx.state && ctx.state.log) log(ctx.state, "script", "Script error: " + e.message);
     console.warn("Script error:", e && e.message);
@@ -1376,7 +1380,9 @@ function evalMiniCond(cond, ctx) {
   if (typeof cond !== "string" || !cond.trim()) return false;
   try {
     const code = compileMiniCond(cond.trim());
-    return !!new Function("ctx", "with (ctx) { return " + code + "; }")(ctx);
+    const sandbox = Object.assign({}, ctx);
+    const context = vm.createContext(sandbox);
+    return !!vm.runInContext("(" + code + ")", context, { timeout: SCRIPT_TIMEOUT, filename: "miniCond.js" });
   } catch (e) {
     return false;
   }
