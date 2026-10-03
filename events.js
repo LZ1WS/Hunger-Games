@@ -1,4 +1,4 @@
-module.exports = [
+module.exports = { POOL: [
   {
     "id": "start_cornucopia",
     "cat": "start",
@@ -29,7 +29,8 @@ module.exports = [
       "water",
       "knife",
       "bandage"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "start_clash",
@@ -105,24 +106,24 @@ module.exports = [
         "relRev": -18
       },
       {
-        "weight": 2,
-        "targets": 3,
-        "tpl": [
-          {
-            "en": "A third tribute dives between {self} and {other}, and the fight goes three ways.",
-            "ru": "Третий трибут бросается между {self} и {other}, и бой становится тройным."
-          }
-        ],
+        "tpl": {
+          "en": "{others[1]} dives between {self} and {other}, and the fight goes three ways.",
+          "ru": "{others[1]} бросается между {self} и {other}, и бой становится тройным."
+        },
         "fxSelf": {
           "health": -12
         },
         "fxOther": {
           "health": -12
         },
+        "targets": 3,
+        "weight": 2,
         "rel": -12,
         "relRev": -12
       }
-    ]
+    ],
+    "enabled": true,
+    "target": null
   },
   {
     "id": "start_truce",
@@ -151,7 +152,8 @@ module.exports = [
       "morale": 6
     },
     "rel": 15,
-    "relRev": 15
+    "relRev": 15,
+    "enabled": true
   },
   {
     "id": "start_flee",
@@ -176,7 +178,8 @@ module.exports = [
     "fxSelf": {
       "health": -3,
       "morale": -4
-    }
+    },
+    "enabled": true
   },
   {
     "id": "start_scavenge",
@@ -207,7 +210,8 @@ module.exports = [
       "meat",
       "rations",
       "knife"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "start_injured",
@@ -236,7 +240,8 @@ module.exports = [
     },
     "fxProf": {
       "melee": -1
-    }
+    },
+    "enabled": true
   },
   {
     "id": "start_cannon",
@@ -260,7 +265,8 @@ module.exports = [
     "targets": 1,
     "fxSelf": {
       "morale": -8
-    }
+    },
+    "enabled": true
   },
   {
     "id": "start_scuffle",
@@ -290,7 +296,8 @@ module.exports = [
       "health": -12
     },
     "rel": -10,
-    "relRev": -10
+    "relRev": -10,
+    "enabled": true
   },
   {
     "id": "start_chaos",
@@ -324,7 +331,8 @@ module.exports = [
       "health": -10
     },
     "rel": -12,
-    "relRev": -12
+    "relRev": -12,
+    "enabled": true
   },
   {
     "id": "gather_berries",
@@ -355,7 +363,8 @@ module.exports = [
     },
     "loot": [
       "berries"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "gather_hunt_ok",
@@ -443,7 +452,8 @@ module.exports = [
           "morale": -4
         }
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "gather_hunt_fail",
@@ -475,7 +485,8 @@ module.exports = [
         "name": "survival",
         "max": 50
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "gather_fish",
@@ -539,7 +550,8 @@ module.exports = [
           "health": -4
         }
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "gather_water",
@@ -567,7 +579,8 @@ module.exports = [
     },
     "loot": [
       "water"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "gather_trap",
@@ -608,7 +621,8 @@ module.exports = [
         "name": "craft",
         "min": 35
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "gather_poison",
@@ -633,7 +647,8 @@ module.exports = [
     "fxSelf": {
       "food": 2,
       "health": -9
-    }
+    },
+    "enabled": true
   },
   {
     "id": "gather_roots",
@@ -658,7 +673,8 @@ module.exports = [
     "fxSelf": {
       "food": 12,
       "energy": -8
-    }
+    },
+    "enabled": true
   },
   {
     "id": "scout_ridge",
@@ -686,7 +702,8 @@ module.exports = [
     },
     "scale": {
       "morale": "survival"
-    }
+    },
+    "enabled": true
   },
   {
     "id": "scout_steal",
@@ -718,7 +735,8 @@ module.exports = [
       "water",
       "knife"
     ],
-    "stat": "thefts"
+    "stat": "thefts",
+    "enabled": true
   },
   {
     "id": "scout_lost",
@@ -744,7 +762,8 @@ module.exports = [
       "energy": -12,
       "morale": -7,
       "food": -4
-    }
+    },
+    "enabled": true
   },
   {
     "id": "scout_cave",
@@ -802,7 +821,8 @@ module.exports = [
           "energy": -6
         }
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "scout_tracks",
@@ -834,32 +854,44 @@ module.exports = [
     },
     "loot": [
       "knife"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "scout_near_miss",
     "cat": "scout",
     "phase": "day",
-    "tpl": [
-      {
-        "en": "A tribute nearly spots {self} while scouting. {self} freezes behind a log until they pass.",
-        "ru": "Трибут едва не замечает {self} во время разведки. {self} замирает за бревном, пока тот не пройдёт."
-      },
-      {
-        "en": "A rustle. {self} freezes as a tribute passes close enough to touch.",
-        "ru": "Шорох. {self} замирает, когда трибут проходит на расстоянии вытянутой руки."
-      },
-      {
-        "en": "{self} ducks behind a trunk, holding their breath as footsteps go by.",
-        "ru": "{self} прячется за стволом, затаив дыхание, пока шаги не стихнут."
-      }
-    ],
+    "tpl": "",
     "weight": 8,
-    "targets": 1,
+    "targets": 2,
     "fxSelf": {
       "energy": -8,
       "morale": -3
-    }
+    },
+    "enabled": true,
+    "fxOther": {},
+    "subs": [
+      {
+        "tpl": [
+          "{other} замечает {self} во время разведки. {self} замирает за бревном, но тот выходит на него.",
+          "Шорох. {self} замирает, когда {other} выходит на него.",
+          "{self} прячется за стволом, затаив дыхание, но шаги {other} приближаются."
+        ],
+        "targets": 2,
+        "weight": 50,
+        "script": "if (self.attributes.stealth >= rand(1, 100)) {\n    log(tr(\"scout_stealth\", { self: self.name, other: other.name }));\n} else if (theirFeel >= 20) {\n  addRel(other, self, -rand(1, 5));\n} else if (theirFeel <= -30) {\n  if (other.attributes.combat >= 60) {\n    addRel(other, self, -rand(15, 25));\n    fight(other, self);\n    log(tr(\"scout_fight\", { self: self.name, other: other.name }));\n  } else if (self.attributes.charm >= 50) {\n    addRel(other, self, -rand(10, 15));\n    log(tr(\"scout_charm\", { self: self.name, other: other.name }));\n  } else {\n    addRel(other, self, -rand(1, 10));\n    log(tr(\"scout_confront\", { self: self.name, other: other.name }));\n  }\n} else {\n    log(tr(\"scout_charm\", { self: self.name, other: other.name }));\n}"
+      },
+      {
+        "tpl": [
+          "{other} едва не замечает {self} во время разведки. {self} замирает за бревном, пока тот не пройдёт.",
+          "Шорох. {self} замирает, когда {other} проходит на расстоянии вытянутой руки.",
+          "{self} прячется за стволом, затаив дыхание, пока шаги {other} не стихнут."
+        ],
+        "targets": 2,
+        "weight": 50
+      }
+    ],
+    "target": null
   },
   {
     "id": "build_shelter",
@@ -894,7 +926,8 @@ module.exports = [
     "loot": [
       "rope"
     ],
-    "flag": "shelter"
+    "flag": "shelter",
+    "enabled": true
   },
   {
     "id": "build_fire",
@@ -966,7 +999,8 @@ module.exports = [
           "energy": -6
         }
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "build_snares",
@@ -999,7 +1033,8 @@ module.exports = [
     },
     "loot": [
       "rope"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "build_spear",
@@ -1031,7 +1066,8 @@ module.exports = [
     },
     "loot": [
       "spear"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "build_stakes",
@@ -1059,7 +1095,8 @@ module.exports = [
     },
     "scale": {
       "supplies": "craft"
-    }
+    },
+    "enabled": true
   },
   {
     "id": "build_collapse",
@@ -1085,7 +1122,8 @@ module.exports = [
       "health": -9,
       "energy": -10,
       "morale": -5
-    }
+    },
+    "enabled": true
   },
   {
     "id": "build_still",
@@ -1118,7 +1156,8 @@ module.exports = [
     },
     "loot": [
       "water"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "fight_ambush",
@@ -1248,7 +1287,8 @@ module.exports = [
         "en": "{self} erupts from the brush and buries a {weapon} in {other}.",
         "ru": "{self} вырывается из кустов и вонзает {weapon} в {other}."
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "fight_duel",
@@ -1370,7 +1410,8 @@ module.exports = [
         "en": "{self} closes in, {weapon} flashing, to duel {other}.",
         "ru": "{self} сближается с {other}, сверкая {weapon}, для дуэли."
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "fight_chase",
@@ -1440,7 +1481,8 @@ module.exports = [
         "en": "{self} hunts {other} down, {weapon} in hand.",
         "ru": "{self} преследует {other}, сжимая в руке {weapon}."
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "fight_standoff",
@@ -1469,7 +1511,8 @@ module.exports = [
       "energy": -6
     },
     "rel": -4,
-    "relRev": -4
+    "relRev": -4,
+    "enabled": true
   },
   {
     "id": "fight_beast",
@@ -1548,7 +1591,8 @@ module.exports = [
           "meat"
         ]
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "fight_training",
@@ -1577,7 +1621,8 @@ module.exports = [
     "fxProf": {
       "melee": 2,
       "ranged": 1
-    }
+    },
+    "enabled": true
   },
   {
     "id": "fight_brawl",
@@ -1625,7 +1670,8 @@ module.exports = [
         "en": "{group} descend into a knife-and-fist brawl.",
         "ru": "{group} сходятся в драке на кулаках и ножах."
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "fight_melee",
@@ -1656,7 +1702,8 @@ module.exports = [
       "energy": -8
     },
     "rel": -8,
-    "relRev": -8
+    "relRev": -8,
+    "enabled": true
   },
   {
     "id": "fight_gang",
@@ -1703,7 +1750,8 @@ module.exports = [
           "ru": "Подавленный числом, {self} падает, когда {others} смыкаются."
         }
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "fight_brawl4",
@@ -1734,7 +1782,8 @@ module.exports = [
       "energy": -10
     },
     "rel": -8,
-    "relRev": -8
+    "relRev": -8,
+    "enabled": true
   },
   {
     "id": "social_stories",
@@ -1822,7 +1871,8 @@ module.exports = [
         "rel": 14,
         "relRev": 14
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "social_share",
@@ -1857,7 +1907,8 @@ module.exports = [
       "relSelf": {
         "min": 0
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_argue",
@@ -1940,7 +1991,8 @@ module.exports = [
         "rel": -8,
         "relRev": -8
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "social_comfort",
@@ -1977,7 +2029,8 @@ module.exports = [
       "relSelf": {
         "min": 10
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_alliance",
@@ -2011,7 +2064,8 @@ module.exports = [
       "relSelf": {
         "min": 20
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_romance",
@@ -2045,7 +2099,8 @@ module.exports = [
       "relSelf": {
         "min": 30
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_distrust",
@@ -2074,7 +2129,8 @@ module.exports = [
       "morale": -4
     },
     "rel": -9,
-    "relRev": -9
+    "relRev": -9,
+    "enabled": true
   },
   {
     "id": "social_lead",
@@ -2107,7 +2163,8 @@ module.exports = [
         "name": "charm",
         "min": 40
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_camp",
@@ -2144,7 +2201,8 @@ module.exports = [
       "relSelf": {
         "min": 0
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_circle",
@@ -2156,8 +2214,8 @@ module.exports = [
         "ru": "Образуется настороженный круг: {group} обмениваются новостями об арене."
       },
       {
-        "en": "A wary ring of tributes trades information about the arena.",
-        "ru": "Настороженный круг трибутов обменивается сведениями об арене."
+        "en": "A wary ring of tributes: {group} trades information about the arena.",
+        "ru": "Настороженный круг трибутов: {group} обменивается сведениями об арене."
       },
       {
         "en": "{group} sit in a careful circle, each watching the others.",
@@ -2174,7 +2232,8 @@ module.exports = [
       "morale": 4
     },
     "rel": 6,
-    "relRev": 6
+    "relRev": 6,
+    "enabled": true
   },
   {
     "id": "social_alliance3",
@@ -2208,7 +2267,8 @@ module.exports = [
       "relSelf": {
         "min": 20
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "social_split",
@@ -2237,7 +2297,8 @@ module.exports = [
       "morale": -6
     },
     "rel": -8,
-    "relRev": -8
+    "relRev": -8,
+    "enabled": true
   },
   {
     "id": "rest_deep",
@@ -2293,7 +2354,8 @@ module.exports = [
           "food": -3
         }
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "rest_meditate",
@@ -2318,7 +2380,8 @@ module.exports = [
     "fxSelf": {
       "morale": 10,
       "energy": 5
-    }
+    },
+    "enabled": true
   },
   {
     "id": "rest_nightmare",
@@ -2343,7 +2406,8 @@ module.exports = [
     "fxSelf": {
       "morale": -9,
       "energy": 5
-    }
+    },
+    "enabled": true
   },
   {
     "id": "rest_restless",
@@ -2368,7 +2432,8 @@ module.exports = [
     "fxSelf": {
       "energy": 5,
       "morale": -8
-    }
+    },
+    "enabled": true
   },
   {
     "id": "rest_daydream",
@@ -2393,7 +2458,8 @@ module.exports = [
     "fxSelf": {
       "morale": 5,
       "energy": 3
-    }
+    },
+    "enabled": true
   },
   {
     "id": "rest_doze",
@@ -2418,7 +2484,8 @@ module.exports = [
     "fxSelf": {
       "energy": 10,
       "food": -2
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_sleep_ok",
@@ -2443,7 +2510,8 @@ module.exports = [
     "fxSelf": {
       "energy": 22,
       "health": 3
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_ambush",
@@ -2528,7 +2596,8 @@ module.exports = [
         "rel": 14,
         "relRev": 14
       }
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "night_beast",
@@ -2554,7 +2623,8 @@ module.exports = [
       "health": -5,
       "morale": -4,
       "energy": -8
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_stars",
@@ -2578,7 +2648,8 @@ module.exports = [
     "targets": 1,
     "fxSelf": {
       "morale": 8
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_cold",
@@ -2642,7 +2713,8 @@ module.exports = [
         }
       }
     ],
-    "cold": true
+    "cold": true,
+    "enabled": true
   },
   {
     "id": "night_guard",
@@ -2667,7 +2739,8 @@ module.exports = [
     "fxSelf": {
       "energy": -9,
       "morale": 5
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_watch_friend",
@@ -2703,7 +2776,8 @@ module.exports = [
       "relSelf": {
         "min": 10
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_theft",
@@ -2739,7 +2813,8 @@ module.exports = [
       "water"
     ],
     "stat": "thefts",
-    "stealth": "theft"
+    "stealth": "theft",
+    "enabled": true
   },
   {
     "id": "night_howls",
@@ -2764,7 +2839,8 @@ module.exports = [
     "fxSelf": {
       "morale": -5,
       "energy": -5
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_dew",
@@ -2791,7 +2867,8 @@ module.exports = [
     },
     "loot": [
       "water"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "night_recall",
@@ -2816,7 +2893,8 @@ module.exports = [
     "fxSelf": {
       "morale": -6,
       "energy": 6
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_campfire",
@@ -2855,7 +2933,8 @@ module.exports = [
       "relSelf": {
         "min": 5
       }
-    }
+    },
+    "enabled": true
   },
   {
     "id": "night_stalked",
@@ -2886,7 +2965,8 @@ module.exports = [
       "morale": -3
     },
     "rel": 6,
-    "relRev": 6
+    "relRev": 6,
+    "enabled": true
   },
   {
     "id": "survive_storm",
@@ -2912,7 +2992,8 @@ module.exports = [
       "health": -5,
       "energy": -8,
       "morale": -6
-    }
+    },
+    "enabled": true
   },
   {
     "id": "survive_sun",
@@ -2937,7 +3018,8 @@ module.exports = [
     "fxSelf": {
       "health": -5,
       "energy": -6
-    }
+    },
+    "enabled": true
   },
   {
     "id": "survive_sick",
@@ -2963,7 +3045,8 @@ module.exports = [
       "health": -12,
       "energy": -8,
       "morale": -6
-    }
+    },
+    "enabled": true
   },
   {
     "id": "survive_injury",
@@ -2991,7 +3074,8 @@ module.exports = [
     },
     "fxProf": {
       "medical": -2
-    }
+    },
+    "enabled": true
   },
   {
     "id": "survive_omen",
@@ -3015,7 +3099,8 @@ module.exports = [
     "targets": 1,
     "fxSelf": {
       "morale": 8
-    }
+    },
+    "enabled": true
   },
   {
     "id": "survive_anthem",
@@ -3039,6 +3124,7 @@ module.exports = [
     "targets": 1,
     "fxSelf": {
       "morale": -5
-    }
+    },
+    "enabled": true
   }
-];
+] };
