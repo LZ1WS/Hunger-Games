@@ -823,11 +823,12 @@ function bossCardHTML(g, primary) {
 }
 
 function renderStatsPanel() {
-  const panel = $("#stats-panel");
-  if (!panel) return;
+  const modal = $("#stats-modal");
+  if (!modal) return;
   const always = state.phase === "finished";
-  panel.classList.toggle("hidden", !showStats && !always);
-  if (!showStats && !always) return;
+  const open = showStats || always;
+  modal.classList.toggle("hidden", !open);
+  if (!open) return;
   const tributes = state.tributes;
   const sortKey = statsSort && STAT_KEYS.some(([k]) => k === statsSort) ? statsSort : "kills";
   $("#stats-sort").innerHTML = STAT_KEYS.map(([k, key]) =>
@@ -1110,9 +1111,22 @@ async function removeTribute(id) {
 // ---------- content editor ----------
 
 function openContent() {
-  renderContent();
-  refreshContentPacks();
-  $("#content-panel").classList.remove("hidden");
+  location.hash = "#content";
+}
+
+function closeContent() {
+  location.hash = "";
+}
+
+function applyContentPage() {
+  if (typeof location === "undefined" || !document.body) return;
+  const isContent = (location.hash || "").replace(/^#/, "") === "content";
+  document.body.classList.toggle("content-page", isContent);
+  $("#content-panel").classList.toggle("hidden", !isContent);
+  if (isContent) {
+    renderContent();
+    refreshContentPacks();
+  }
 }
 
 function saveContentPack() {
@@ -1149,7 +1163,7 @@ async function deleteContentPackByName(name) {
 }
 
 function closeContent() {
-  $("#content-panel").classList.add("hidden");
+  location.hash = "";
 }
 
 async function refreshContent() {
@@ -1699,19 +1713,19 @@ async function saveEvent() {
       tpl: buildTplFromRows("#event-tpls", existing && existing.tpl),
       fxSelf: rowsToObj($("#event-fxself")),
       fxOther: rowsToObj($("#event-fxother")),
-      loot: parseLoot($("#event-loot").value),
-      fxProf: Object.keys(prof).length ? prof : undefined,
-      subs: cleanSubs.length ? cleanSubs : undefined,
+      loot: parseLoot($("#event-loot").value) || null,
+      fxProf: Object.keys(prof).length ? prof : null,
+      subs: cleanSubs.length ? cleanSubs : null,
       target: targetFromSection("#event-target")
     };
     const evtScript = collectScript("event");
-    if (evtScript) def.script = evtScript;
-    def.outcome = outcomesFromSection("#event-outcomes", existing && existing.outcome);
-    def.weaponTpls = weaponTplsFromSection("#event-wtpls", existing && existing.weaponTpls);
+    def.script = evtScript || null;
+    def.outcome = outcomesFromSection("#event-outcomes", existing && existing.outcome) || null;
+    def.weaponTpls = weaponTplsFromSection("#event-wtpls", existing && existing.weaponTpls) || null;
     const rel = Number($("#event-rel").value);
     const relRev = Number($("#event-relrev").value);
-    if (rel !== 0) def.rel = rel;
-    if (relRev !== 0) def.relRev = relRev;
+    def.rel = rel;
+    def.relRev = relRev;
     Object.assign(def, adv);
     if (!def.id) throw new Error("ID required");
 
@@ -2295,18 +2309,15 @@ async function saveGlobal() {
       endTpl: buildTplFromRows("#global-endtpls", existing && existing.endTpl)
     };
     if (maxTriggers !== "") def.maxTriggers = Math.max(1, Number(maxTriggers) || 1);
-    if (Object.keys(mods).length) def.mods = mods;
-    if (disable && disable.length) def.disable = disable;
-    if (replaceDay.length || replaceNight.length) {
-      def.replace = {};
-      if (replaceDay.length) def.replace.day = replaceDay;
-      if (replaceNight.length) def.replace.night = replaceNight;
-    }
-    if (addonDay.length || addonNight.length) {
-      def.addon = {};
-      if (addonDay.length) def.addon.day = addonDay;
-      if (addonNight.length) def.addon.night = addonNight;
-    }
+    else def.maxTriggers = null;
+    def.mods = Object.keys(mods).length ? mods : null;
+    def.disable = disable && disable.length ? disable : null;
+    def.replace = {};
+    if (replaceDay.length) def.replace.day = replaceDay;
+    if (replaceNight.length) def.replace.night = replaceNight;
+    def.addon = {};
+    if (addonDay.length) def.addon.day = addonDay;
+    if (addonNight.length) def.addon.night = addonNight;
     def.mode = globalModeOf(def);
     const bossName = $("#global-boss-name").value.trim();
     if (bossName) {
@@ -2325,18 +2336,19 @@ async function saveGlobal() {
           stealth: Math.max(0, Math.min(100, Number($("#global-boss-stealth").value) || 30)),
           defense: Math.max(0, Math.min(100, Number($("#global-boss-defense").value) || 0))
         },
-        behaviors: behaviors
+        behaviors: behaviors,
+        retaliate: $("#global-boss-retaliate").checked,
+        explosion: Number($("#global-boss-explosion").value) || 0
       };
-      if (!$("#global-boss-retaliate").checked) def.boss.retaliate = false;
-      const explosion = Number($("#global-boss-explosion").value) || 0;
-      if (explosion > 0) def.boss.explosion = explosion;
       const weapons = bossWeapons.filter((w) => w && w.dmg).map((w) => ({ cat: w.cat, dmg: normalizeBossDmgInput(w.dmg), spd: Math.max(1, Math.round(Number(w.spd)) || 1) }));
       def.boss.weapons = weapons;
       const dmgMult = Number($("#global-boss-dmgmult").value) || 1;
-      if (dmgMult !== 1) def.boss.damageMult = Math.max(0, Math.min(5, dmgMult));
+      def.boss.damageMult = Math.max(0, Math.min(5, dmgMult));
+    } else {
+      def.boss = null;
     }
     const script = collectScript("global");
-    if (script) def.script = script;
+    def.script = script || null;
     if (!def.id) throw new Error("ID required");
 
     if (globalEditId) {
@@ -2470,24 +2482,24 @@ async function saveAbility() {
       weights
     };
     const cond = $("#ab-cond").value.trim();
-    if (cond) def.cond = cond;
+    def.cond = cond || null;
     const dealt = Number($("#ab-dealt").value);
     const taken = Number($("#ab-taken").value);
-    if (dealt !== 1) def.damageDealt = dealt;
-    if (taken !== 1) def.damageTaken = taken;
+    def.damageDealt = dealt;
+    def.damageTaken = taken;
     const upkeep = {};
     const f = Number($("#ab-food").value), en = Number($("#ab-energy").value);
     if (f !== 0) upkeep.food = f;
     if (en !== 0) upkeep.energy = en;
-    if (Object.keys(upkeep).length) def.upkeep = upkeep;
+    def.upkeep = Object.keys(upkeep).length ? upkeep : null;
     const cold = Number($("#ab-cold").value), scav = Number($("#ab-scav").value), target = Number($("#ab-target").value);
-    if (cold !== 0) def.coldResist = cold;
-    if (scav !== 0) def.scavengeChance = scav;
-    if (target !== 1) def.targetWeight = target;
+    def.coldResist = cold;
+    def.scavengeChance = scav;
+    def.targetWeight = target;
     const xaBelow = Number($("#ab-xa-below").value), xaMax = Number($("#ab-xa-max").value);
-    if (xaBelow > 0 && xaMax > 0) def.extraAction = { stat: $("#ab-xa-stat").value, below: xaBelow, max: xaMax };
+    def.extraAction = (xaBelow > 0 && xaMax > 0) ? { stat: $("#ab-xa-stat").value, below: xaBelow, max: xaMax } : null;
     const scriptHooks = collectScript("ability");
-    if (scriptHooks) def.script = scriptHooks;
+    def.script = scriptHooks || null;
     if (!def.id) throw new Error("ID required");
     if (abilityEditId) {
       await call("/api/abilities/" + abilityEditId, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(def) });
@@ -2900,6 +2912,16 @@ function init() {
     statsSort = e.target.value;
     renderStatsPanel();
   });
+  $("#stats-close").addEventListener("click", () => {
+    showStats = false;
+    $("#stats-modal").classList.add("hidden");
+  });
+  $("#stats-modal").addEventListener("click", (e) => {
+    if (e.target === $("#stats-modal")) {
+      showStats = false;
+      $("#stats-modal").classList.add("hidden");
+    }
+  });
   $("#personality-cancel").addEventListener("click", () => {
     $("#personality-modal").classList.add("hidden");
     personalityEditId = null;
@@ -3201,6 +3223,8 @@ $("#edit-avatar-clear").addEventListener("click", () => {
     if (el) mutate("/api/map", { scarcity: { [el.dataset.devscarcity]: Number(el.value) } });
   });
   document.addEventListener("keydown", onKeydown);
+  if (window.addEventListener) window.addEventListener("hashchange", applyContentPage);
+  applyContentPage();
 
   Promise.all([call("/api/catalog"), call("/api/content"), call("/api/state")]).then(async ([cat, content, s]) => {
     catalog = Object.assign({}, cat, content);
@@ -3211,6 +3235,7 @@ $("#edit-avatar-clear").addEventListener("click", () => {
     fallback = fb;
     renderAll();
     refreshPacks();
+    applyContentPage();
   }).catch((err) => {
     $("#controls").innerHTML = '<p class="err" style="color:var(--red)">Cannot reach the server: ' + esc(err.message) + "</p>";
   });

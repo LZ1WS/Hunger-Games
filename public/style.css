@@ -659,6 +659,12 @@ input[type="text"], select {
 
 .tab-body.hidden { display: none; }
 
+/* content editor as a separate page (via #content hash route) */
+body.content-page header { display: none; }
+body.content-page main { max-width: 1200px; }
+body.content-page main > *:not(#content-panel) { display: none; }
+body.content-page #content-panel { display: block; max-width: none; }
+
 .modal-box.wide { max-width: 640px; }
 
 .btn.small { padding: 5px 10px; font-size: 12px; }

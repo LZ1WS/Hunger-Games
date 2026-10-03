@@ -30,7 +30,7 @@
         <h2 data-i18n="ui.contentTitle">Game Content</h2>
         <div class="panel-head-btns">
           <a class="btn ghost" href="docs.html" target="_blank" rel="noopener" data-i18n="ui.docsBtn">📖 Code editor</a>
-          <button class="btn ghost" id="content-close">&#x2715;</button>
+          <button class="btn ghost" id="content-close">&#x2190; <span data-i18n="ui.contentBack">Back</span></button>
         </div>
       </div>
       <div class="content-packs">
@@ -171,14 +171,19 @@
         <p class="hint" data-i18n="ui.relHint">Each cell is how the row tribute feels about the column tribute. Drag the sliders in the setup phase. The Games will change these on their own.</p>
       </section>
 
-      <section class="panel hidden" id="stats-panel">
-        <h2 data-i18n="ui.panelStats">Statistics</h2>
-        <div class="field target-row">
-          <label data-i18n="ui.statsLeader">Leaderboard by</label>
-          <select id="stats-sort" class="tb-mode"></select>
+      <div class="modal hidden" id="stats-modal">
+        <div class="modal-box wide">
+          <h3 data-i18n="ui.panelStats">Statistics</h3>
+          <div class="field target-row">
+            <label data-i18n="ui.statsLeader">Leaderboard by</label>
+            <select id="stats-sort" class="tb-mode"></select>
+          </div>
+          <div id="stats-body"></div>
+          <div class="modal-actions">
+            <button class="btn ghost" id="stats-close" data-i18n="ui.btnClose">Close</button>
+          </div>
         </div>
-        <div id="stats-body"></div>
-      </section>
+      </div>
 
       <section class="panel hidden" id="packs-panel">
         <h2 data-i18n="ui.panelPacks">Tribute Packs</h2>
