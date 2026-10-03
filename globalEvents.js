@@ -1,4 +1,4 @@
-module.exports = [
+module.exports = { GLOBAL_EVENTS: [
   {
     "id": "the_flood",
     "mode": "replace",
@@ -114,7 +114,8 @@ module.exports = [
           "weight": 4
         }
       ]
-    }
+    },
+    "enabled": true
   },
   {
     "id": "volcanic_eruption",
@@ -183,7 +184,8 @@ module.exports = [
           "weight": 5
         }
       ]
-    }
+    },
+    "enabled": true
   },
   {
     "id": "heat_wave",
@@ -213,7 +215,8 @@ module.exports = [
       "build_fire",
       "night_cold",
       "gather_hunt_ok"
-    ]
+    ],
+    "enabled": true
   },
   {
     "id": "sponsor_bounty",
@@ -268,7 +271,8 @@ module.exports = [
           "weight": 5
         }
       ]
-    }
+    },
+    "enabled": true
   },
   {
     "id": "blood_moon",
@@ -328,7 +332,8 @@ module.exports = [
           "weight": 4
         }
       ]
-    }
+    },
+    "enabled": true
   },
   {
     "id": "famine",
@@ -373,7 +378,8 @@ module.exports = [
           "weight": 5
         }
       ]
-    }
+    },
+    "enabled": true
   },
   {
     "id": "bounty",
@@ -393,11 +399,12 @@ module.exports = [
       "onStart": "set target to random\nlog \"A bounty is placed on {target}! Kill them today for a reward.\"",
       "onDeath": "if victim is target\n  set claimed to true\n  if killer is not none\n    reward killer medkit,grenade,rations,shield\n    log \"{killer} claimed the bounty on {victim}!\"\n  end\n  if killer is none\n    log \"The bounty target has died, but no one collected the reward.\"\n  end\nend",
       "onEnd": "if claimed is not true\n  log \"The bounty on {target} has expired. No reward was paid.\"\nend"
-    }
+    },
+    "enabled": true
   },
   {
     "id": "boss_test",
-    "mode": "boss",
+    "mode": "influence",
     "chance": 0.12,
     "weight": 8,
     "duration": {
@@ -413,22 +420,370 @@ module.exports = [
       "ru": "Зверь отступает с арены."
     },
     "boss": {
-      "name": {
-        "en": "The Beast",
-        "ru": "Зверь"
-      },
-      "emoji": "\u{1F479}",
+      "name": "Зверь",
+      "emoji": "👹",
       "count": 1,
       "attributes": {
         "health": 120,
         "morale": 80,
         "combat": 70,
-        "stealth": 50
+        "stealth": 50,
+        "defense": 0
+      },
+      "behaviors": [
+        "patrol",
+        "drain"
+      ],
+      "weapon": {
+        "cat": "melee",
+        "dmg": 20
+      }
+    },
+    "enabled": true
+  },
+  {
+    "id": "green_dawn",
+    "mode": "influence",
+    "chance": 0.25,
+    "weight": 10,
+    "duration": {
+      "type": "endless",
+      "value": 1
+    },
+    "tpl": "Однажды мы всем задаём этот вопрос. Откуда мы взялись? Получившие от кого-то жизнь и безответственно оставленные без присмотра.",
+    "endTpl": "Жизнь есть страдание.",
+    "boss": {
+      "name": "Сомнение",
+      "emoji": "🤖",
+      "count": 5,
+      "attributes": {
+        "health": 150,
+        "morale": 100,
+        "combat": 30,
+        "stealth": 30,
+        "defense": 0
+      },
+      "behaviors": [
+        "patrol"
+      ],
+      "weapons": [
+        {
+          "cat": "melee",
+          "dmg": [
+            3,
+            5
+          ],
+          "spd": 1
+        }
+      ]
+    },
+    "enabled": true,
+    "script": {
+      "onDamage": "const target = damage.target\n\nif (target && !target.maxHealth && damage.cause === \"boss\") {\n    const health = target.attributes.health;\n\n    if (health === 0) {\n        for (const id of Object.keys(g.boss.participants || {})) {\n            const t = byId(id);\n            if (t && isAlive(t) && t.id !== target.id) { add(t, \"morale\", -6); log(t.name + \" замечает как робот потрошит труп \" + target.name + \"!\"); }\n        }\n    }\n}"
+    }
+  },
+  {
+    "id": "amber_dawn",
+    "mode": "influence",
+    "chance": 0.25,
+    "weight": 10,
+    "duration": {
+      "type": "endless",
+      "value": 1
+    },
+    "tpl": "Переваренная пища, абсолютно взаимозаменяема.",
+    "endTpl": "Чтобы жить, мы ели без конца. Неизбежное истощение, мусор...",
+    "boss": {
+      "name": "Переваренная пища",
+      "emoji": "🪱",
+      "count": 16,
+      "attributes": {
+        "health": 35,
+        "morale": 100,
+        "combat": 10,
+        "stealth": 30,
+        "defense": 0
+      },
+      "behaviors": [
+        "patrol"
+      ],
+      "weapons": [
+        {
+          "cat": "melee",
+          "dmg": [
+            1,
+            3
+          ],
+          "spd": 1
+        }
+      ]
+    },
+    "enabled": true
+  },
+  {
+    "id": "crimson_dawn",
+    "mode": "influence",
+    "chance": 0.25,
+    "weight": 10,
+    "duration": {
+      "type": "full_days",
+      "value": 3
+    },
+    "tpl": "Давайте зажжём в жизни яркое пламя, словно свечу, что однажды погаснет.",
+    "endTpl": "Жизнь означает желание.",
+    "boss": {
+      "name": "Аплодисменты",
+      "emoji": "🤡",
+      "count": 6,
+      "attributes": {
+        "health": 80,
+        "morale": 100,
+        "combat": 60,
+        "stealth": 30,
+        "defense": 20
       },
       "behaviors": [
         "drain",
+        "steal"
+      ],
+      "retaliate": false,
+      "weapons": []
+    },
+    "script": {
+      "onDamage": "if (damage.target && damage.target.maxHealth) {   // a hunter hit the Boss\n  const prev = memory.lastSquad;                  // count before this hit\n  memory.lastSquad = damage.remainingCount;       // remember the new count\nif (prev != null && damage.remainingCount < prev) {\n  for (const id of Object.keys(g.boss.participants || {})) {\n    const t = byId(id);\n    if (t && isAlive(t)) { add(t, \"health\", -rand(10, 15)); log(t.name + \" задевается взрывом!\"); }\n  }\n}\n}"
+    },
+    "enabled": true
+  },
+  {
+    "id": "green_noon",
+    "mode": "influence",
+    "chance": 0.2,
+    "weight": 10,
+    "duration": {
+      "type": "endless",
+      "value": 1
+    },
+    "tpl": "В конце концов, они связаны жизнью. Мы всего лишь отбросили отчанье и гнев.",
+    "endTpl": "Мы познаем что есть жизнь и душа своими силами.",
+    "boss": {
+      "name": "Процесс понимания",
+      "emoji": "🤖",
+      "count": 5,
+      "attributes": {
+        "health": 300,
+        "morale": 100,
+        "combat": 60,
+        "stealth": 30,
+        "defense": 20
+      },
+      "behaviors": [
         "patrol"
+      ],
+      "weapons": [
+        {
+          "cat": "melee",
+          "dmg": [
+            1,
+            3
+          ],
+          "spd": 3
+        },
+        {
+          "cat": "ranged",
+          "dmg": [
+            1,
+            2
+          ],
+          "spd": 1
+        }
       ]
+    },
+    "enabled": true
+  },
+  {
+    "id": "indigo_noon",
+    "mode": "influence",
+    "chance": 0.2,
+    "weight": 6,
+    "duration": {
+      "type": "nights",
+      "value": 3
+    },
+    "tpl": "Когда ночь наступает в тёмном закоулке, приходят они.",
+    "endTpl": "Когда настанет рассвет, ничего уже не останется.",
+    "boss": {
+      "name": "Чистильщик",
+      "emoji": "🧹",
+      "count": 12,
+      "attributes": {
+        "health": 200,
+        "morale": 100,
+        "combat": 60,
+        "stealth": 30,
+        "defense": 10
+      },
+      "behaviors": [
+        "patrol",
+        "drain"
+      ],
+      "weapons": [
+        {
+          "cat": "melee",
+          "dmg": [
+            4,
+            5
+          ],
+          "spd": 1
+        },
+        {
+          "cat": "melee",
+          "dmg": [
+            18,
+            22
+          ],
+          "spd": 1
+        }
+      ]
+    },
+    "enabled": true
+  },
+  {
+    "id": "purple_noon",
+    "mode": "mixed",
+    "chance": 0.2,
+    "weight": 8,
+    "duration": {
+      "type": "endless",
+      "value": 1
+    },
+    "tpl": "Лишь низкие поступки были услышаны нами, и мы добивались милосердия и любви к ним.",
+    "endTpl": "Мы не сможем понять их, как и они не смогут понять нас.",
+    "mods": {
+      "nerf": {
+        "morale": 10,
+        "energy": 10
+      }
+    },
+    "boss": {
+      "name": "Великая любовь к нам",
+      "emoji": "🪨",
+      "count": 6,
+      "attributes": {
+        "health": 350,
+        "morale": 100,
+        "combat": 60,
+        "stealth": 30,
+        "defense": 20
+      },
+      "behaviors": [
+        "drain"
+      ],
+      "weapons": [
+        {
+          "cat": "melee",
+          "dmg": 1,
+          "spd": 6
+        }
+      ]
+    },
+    "replace": {
+      "day": [
+        {
+          "tpl": "Монолиты начинают светится и {self} и {others} становится плохо.",
+          "targets": [
+            1,
+            4
+          ],
+          "weight": 30,
+          "target": "random",
+          "fxSelf": {
+            "health": -10,
+            "energy": -10,
+            "morale": -10
+          },
+          "fxOther": {
+            "health": -10,
+            "energy": -10,
+            "morale": -10
+          }
+        }
+      ],
+      "night": [
+        {
+          "tpl": "Монолиты начинают светится и {self} и {others} становится плохо.",
+          "targets": [
+            1,
+            4
+          ],
+          "weight": 30,
+          "target": "random",
+          "fxSelf": {
+            "health": -10,
+            "energy": -10,
+            "morale": -10
+          },
+          "fxOther": {
+            "health": -10,
+            "energy": -10,
+            "morale": -10
+          }
+        }
+      ]
+    },
+    "script": {
+      "onStart": "if (Math.random() < 0.5) {\n  const n = rand(1, 3);                 // random group size between 1 and 3\n  const pool = state.tributes.filter(isAlive).slice();\n  const targets = [];\n  while (targets.length < n && pool.length) {\n    targets.push(pool.splice(rand(0, pool.length - 1), 1)[0]); // draw without repeats\n  }\n\n  for (const target of targets) {\n    add(target, \"health\", -100);            // 100 HP damage\n    log(target.name + \" был раздавлен Монолитом!\");\n  }\n}",
+      "onDay": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" становится плохо от сияния Монолитов.\");\n}",
+      "onNight": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" становится плохо от сияния Монолитов.\");\n}"
+    },
+    "enabled": true
+  },
+  {
+    "id": "crimson_noon",
+    "mode": "influence",
+    "chance": 0.2,
+    "weight": 10,
+    "duration": {
+      "type": "endless",
+      "value": 1
+    },
+    "tpl": "Наше шествие не кончается и мы делимся нашей радостью.",
+    "endTpl": "Мы принимаем все удары жизни и саму жизнь, гармонию плоти и более прекрасные отличия.",
+    "boss": {
+      "name": "Гармония кожи",
+      "emoji": "🤡",
+      "count": 1,
+      "attributes": {
+        "health": 550,
+        "morale": 100,
+        "combat": 60,
+        "stealth": 30,
+        "defense": 50
+      },
+      "behaviors": [
+        "patrol"
+      ],
+      "weapons": [
+        {
+          "cat": "melee",
+          "dmg": [
+            4,
+            9
+          ],
+          "spd": 1
+        },
+        {
+          "cat": "melee",
+          "dmg": [
+            7,
+            10
+          ],
+          "spd": 1
+        }
+      ]
+    },
+    "enabled": true,
+    "script": {
+      "onSlay": "for (let i = 0; i < 3; i++) {\n  triggerGlobal('crimson_dawn');\n  log(bossName() + ' разделяется на три Аплодисмента!');\n}"
     }
   }
-];
+] };
