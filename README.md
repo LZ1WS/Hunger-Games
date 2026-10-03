@@ -5,6 +5,10 @@ A local, event-driven Hunger Games inspired simulator with a web UI. Set up a ro
 Zero dependencies, no build step, vanilla JS frontend.
 
 > **Note:** This project was created primarily with the help of AI. Review the code before relying on it, especially the script-execution features described below.
+## Creator's Message
+This project was created out of boredom and due to not finding the existing Hunger Game Event type games on the internet sufficiently engaging. So instead of trying to find compromises with existing public Hunger Games Simulators I just booted an AI LLM and created it for myself.
+I don't know JavaScript (maybe only on a surface level due to similarities with LUA) and 99% of the project was generated using AI, as mentioned before, so I can't support this in-depth until I master JavaScript. To get a better grasp at JavaScript language a simple "mod" support was added through script editor, using which I've myself created some simple scripts for Global Event Bosses and some default events were also enhanced by me.
+I've catered most of the features to my demands and wants, but if you find something that you like yourself - I'd consider it a win.
 
 ## Quick start
 
