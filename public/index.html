@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Hunger Games — Event Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg"></div>
+
+  <header>
+    <div class="brand">
+      <span class="flame">&#x1F525;</span>
+      <h1 data-i18n="ui.brandTitle">THE HUNGER GAMES</h1>
+      <span class="sub" data-i18n="ui.brandSub">event simulator</span>
+    </div>
+    <div class="status">
+      <span id="phase-pill" class="pill">SETUP</span>
+      <span id="day-pill" class="pill">Day 0</span>
+      <span id="alive-pill" class="pill">0 Alive</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="controls" class="controls"></section>
+
+    <section id="content-panel" class="panel hidden">
+      <div class="panel-head">
+        <h2 data-i18n="ui.contentTitle">Game Content</h2>
+        <div class="panel-head-btns">
+          <a class="btn ghost" href="docs.html" target="_blank" rel="noopener" data-i18n="ui.docsBtn">📖 Code editor</a>
+          <button class="btn ghost" id="content-close">&#x2715;</button>
+        </div>
+      </div>
+      <div class="content-packs">
+        <div class="content-toolbar"><button class="btn primary small" id="contentpack-save">💾 <span data-i18n="ui.contentPackSave">Save current as pack</span></button></div>
+        <div id="contentpack-list" class="content-list"></div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="items" data-i18n="ui.contentTabItems">Items</button>
+        <button class="tab-btn" data-tab="events" data-i18n="ui.contentTabEvents">Events</button>
+        <button class="tab-btn" data-tab="globals" data-i18n="ui.contentTabGlobals">Global Events</button>
+        <button class="tab-btn" data-tab="personalities" data-i18n="ui.contentTabPersonalities">Personalities</button>
+        <button class="tab-btn" data-tab="abilities" data-i18n="ui.contentTabAbilities">Abilities</button>
+        <button class="tab-btn" data-tab="languages" data-i18n="ui.contentTabLanguages">Languages</button>
+        <button class="btn ghost" id="content-reload" data-i18n="ui.contentReload">&#x21BA; Reload from files</button>
+      </div>
+      <div id="content-items" class="tab-body"></div>
+      <div id="content-events" class="tab-body hidden"></div>
+      <div id="content-globals" class="tab-body hidden"></div>
+      <div id="content-personalities" class="tab-body hidden"></div>
+      <div id="content-abilities" class="tab-body hidden"></div>
+      <div id="content-languages" class="tab-body hidden"></div>
+    </section>
+
+    <nav class="main-tabs">
+      <button class="tab-btn active" data-sheet="events" data-i18n="ui.mainTabEvents">Event Log</button>
+      <button class="tab-btn" data-sheet="tributes" data-i18n="ui.mainTabTributes">Tributes</button>
+      <button class="tab-btn" data-sheet="map" data-i18n="ui.mainTabMap">Map</button>
+    </nav>
+
+    <div class="tab-sheet" data-sheet="events">
+      <div id="winner-banner" class="winner-banner hidden"></div>
+
+      <section class="panel hidden" id="win-panel">
+        <h2 data-i18n="ui.winPanel">Win Condition</h2>
+        <div class="field">
+          <div id="win-mode" class="win-modes"></div>
+        </div>
+        <div class="field" id="win-endday-field">
+          <label for="win-endday" data-i18n="ui.winEndDay">End day (survivors win)</label>
+          <input id="win-endday" type="number" min="1" value="10">
+        </div>
+        <div class="field" id="win-boss-field">
+          <label data-i18n="ui.winBossMin">Boss must spawn by day</label>
+          <input id="win-bossmin" type="number" min="1" placeholder="∞">
+          <label data-i18n="ui.winBossCount">Bosses to spawn (boss_slayer)</label>
+          <input id="win-bosscount" type="number" min="1" value="1">
+        </div>
+        <div class="field">
+          <label class="check"><input type="checkbox" id="win-alliances-toggle"> <span data-i18n="ui.winAlliancesToggle">Dynamic alliances (any mode)</span></label>
+        </div>
+        <div class="field" id="win-alliances-field">
+          <label data-i18n="ui.winAlliances">Alliances (Hunger Games+)</label>
+          <div id="win-alliances" class="alliance-list"></div>
+          <p class="hint" data-i18n="ui.winAllianceHint">Tributes in the same alliance win together if they are the last faction standing. Solo tributes always compete alone.</p>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="boss-panel">
+        <h2 data-i18n="ui.bossPanel">Threat</h2>
+        <div id="boss-body"></div>
+      </section>
+
+      <section class="panel hidden" id="dev-events">
+        <h2 data-i18n="ui.devEvents">Debug — Events</h2>
+        <div class="field two-col">
+          <div>
+            <label data-i18n="ui.devForceGlobal">Force a global event</label>
+            <div class="dev-row">
+              <select id="dev-global"></select>
+              <button class="btn gold small" id="dev-global-go" data-i18n="ui.devTrigger">Trigger</button>
+            </div>
+          </div>
+          <div>
+            <label data-i18n="ui.devForceEvent">Force a regular event</label>
+            <div class="dev-row">
+              <select id="dev-event-cat"></select>
+              <select id="dev-event-tribute"></select>
+              <button class="btn gold small" id="dev-event-go" data-i18n="ui.devTrigger">Trigger</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel log-panel">
+        <h2 data-i18n="ui.panelLog">Arena Log</h2>
+        <div id="log-list" class="log-list"></div>
+      </section>
+    </div>
+
+    <div class="tab-sheet hidden" data-sheet="tributes">
+      <section class="panel">
+        <h2 data-i18n="ui.panelTributes">Tributes</h2>
+        <div id="tribute-grid" class="tribute-grid"></div>
+      </section>
+
+      <section class="panel hidden" id="dev-tribute">
+        <h2 data-i18n="ui.devTribute">Debug — Tribute</h2>
+        <div class="field target-row">
+          <label for="dev-tribute-pick" data-i18n="ui.panelTributes">Tribute</label>
+          <select id="dev-tribute-pick"></select>
+          <span class="hint" data-i18n="ui.devTributeHint">Changes apply to the live game only; they never leak into setup.</span>
+        </div>
+        <div class="field two-col">
+          <div>
+            <label data-i18n="ui.fieldAttributes">Attributes</label>
+            <div id="dev-tribute-stats" class="edit-stats"></div>
+          </div>
+          <div>
+            <label data-i18n="ui.fieldProficiencies">Proficiencies</label>
+            <div id="dev-tribute-profs" class="edit-stats"></div>
+          </div>
+        </div>
+        <div class="field target-row">
+          <label for="dev-tribute-pers" data-i18n="ui.fieldPersonality">Personality</label>
+          <select id="dev-tribute-pers"></select>
+        </div>
+        <div class="field target-row">
+          <label for="dev-item" data-i18n="ui.devGrantItem">Grant item</label>
+          <select id="dev-item"></select>
+          <button class="btn gold small" id="dev-item-add" data-i18n="ui.devAdd">+ Add</button>
+        </div>
+        <div class="field">
+          <label data-i18n="ui.invLabel">Inventory</label>
+          <div id="dev-tribute-inv" class="dev-inv"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="ui.panelRelationships">Relationships</h2>
+        <div class="cat-filters">
+          <button class="cat-btn active" data-rel-view="table" data-i18n="ui.relViewTable">Table</button>
+          <button class="cat-btn" data-rel-view="radial" data-i18n="ui.relViewRadial">Radial</button>
+        </div>
+        <div class="matrix-scroll">
+          <table id="rel-matrix"></table>
+        </div>
+        <div id="rel-radial" class="rel-radial hidden"></div>
+        <p class="hint" data-i18n="ui.relHint">Each cell is how the row tribute feels about the column tribute. Drag the sliders in the setup phase. The Games will change these on their own.</p>
+      </section>
+
+      <section class="panel hidden" id="stats-panel">
+        <h2 data-i18n="ui.panelStats">Statistics</h2>
+        <div class="field target-row">
+          <label data-i18n="ui.statsLeader">Leaderboard by</label>
+          <select id="stats-sort" class="tb-mode"></select>
+        </div>
+        <div id="stats-body"></div>
+      </section>
+
+      <section class="panel hidden" id="packs-panel">
+        <h2 data-i18n="ui.panelPacks">Tribute Packs</h2>
+        <div class="content-toolbar"><button class="btn primary small" id="pack-save">💾 <span data-i18n="ui.packSave">Save current as pack</span></button></div>
+        <div id="pack-list" class="content-list"></div>
+      </section>
+    </div>
+
+    <div class="tab-sheet hidden" data-sheet="map">
+      <section class="panel hidden" id="map-panel">
+        <h2 data-i18n="ui.panelMap">Map</h2>
+        <div class="field two-col">
+          <div>
+            <label for="map-biome" data-i18n="ui.mapBiome">Biome</label>
+            <select id="map-biome"></select>
+          </div>
+          <div class="checks map-checks">
+            <label class="check"><input type="checkbox" id="map-weather"> <span data-i18n="ui.mapWeather">Weather effects</span></label>
+            <label class="check"><input type="checkbox" id="map-replenish"> <span data-i18n="ui.mapReplenish">Resource replenishment event</span></label>
+            <label class="check"><input type="checkbox" id="map-globals"> <span data-i18n="ui.mapGlobals">Global events</span></label>
+            <label class="check globals-limit"><span data-i18n="ui.mapGlobalsMin">Global events per game: min</span><input id="map-globals-min" type="number" min="0" placeholder="∞"><span data-i18n="ui.mapGlobalsMax">max</span><input id="map-globals-max" type="number" min="0" placeholder="∞"></label>
+          </div>
+        </div>
+        <div class="field">
+          <label data-i18n="ui.mapScarcity">Resource scarcity</label>
+          <div id="map-scarcity" class="edit-stats"></div>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="dev-map">
+        <h2 data-i18n="ui.devMap">Debug — Map</h2>
+        <div class="field target-row">
+          <label class="check"><input type="checkbox" id="dev-weather"> <span data-i18n="ui.mapWeather">Weather effects</span></label>
+          <button class="btn gold small" id="dev-weather-go" data-i18n="ui.devWeatherGo">Force weather now</button>
+        </div>
+        <div class="field">
+          <label data-i18n="ui.mapScarcity">Resource scarcity</label>
+          <div id="dev-scarcity" class="edit-stats"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal hidden" id="edit-modal">
+    <div class="modal-box">
+      <h3 id="modal-title">Edit Tribute</h3>
+      <div class="field">
+        <label for="edit-name" data-i18n="ui.fieldName">Name</label>
+        <input id="edit-name" type="text" maxlength="24" placeholder="Tribute name">
+      </div>
+      <div class="field">
+        <label for="edit-emoji" data-i18n="ui.fieldEmoji">Emoji</label>
+        <input id="edit-emoji" type="text" maxlength="8" placeholder="🎭">
+        <div id="emoji-quick" class="emoji-quick"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.avatarImg">Avatar image (optional)</label>
+        <div class="avatar-row">
+          <input type="file" id="edit-avatar-file" accept="image/*">
+          <img id="edit-avatar-preview" class="avatar-preview hidden" alt="">
+          <button class="btn ghost small" id="edit-avatar-clear" data-i18n="ui.avatarClear">Clear image</button>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="edit-gender" data-i18n="ui.fieldGender">Gender</label>
+          <select id="edit-gender"></select>
+        </div>
+        <div>
+          <label for="edit-personality" data-i18n="ui.fieldPersonality">Personality</label>
+          <select id="edit-personality"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="edit-alliance" data-i18n="ui.fieldAlliance">Alliance (optional, for Hunger Games+)</label>
+        <input id="edit-alliance" type="text" maxlength="24" placeholder="e.g. District 1">
+      </div>
+      <div class="field">
+        <label for="edit-ability" data-i18n="ui.fieldAbility">Ability (passive)</label>
+        <select id="edit-ability"></select>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.fieldAttributes">Attributes</label>
+        <div id="edit-stats" class="edit-stats"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.fieldProficiencies">Weapon / Tool Proficiencies</label>
+        <div id="edit-profs" class="edit-stats"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.fieldItems">Starting items</label>
+        <div class="target-row">
+          <select id="edit-item-pick"></select>
+          <button class="btn ghost small" id="edit-item-add" data-i18n="ui.devAdd">+ Add</button>
+        </div>
+        <div id="edit-items" class="dev-inv"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="edit-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="edit-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="item-modal">
+    <div class="modal-box">
+      <h3 id="item-modal-title">Item</h3>
+      <div class="field two-col">
+        <div>
+          <label for="item-name" data-i18n="ui.itemNameLabel">Name</label>
+          <input id="item-name" type="text" maxlength="24">
+        </div>
+        <div>
+          <label for="item-emoji" data-i18n="ui.itemEmojiLabel">Emoji</label>
+          <input id="item-emoji" type="text" maxlength="4">
+        </div>
+      </div>
+      <div class="field">
+        <label for="item-cat" data-i18n="ui.itemCatLabel">Category</label>
+        <select id="item-cat"></select>
+      </div>
+      <div class="field item-nums">
+        <label><span data-i18n="ui.itemDmgLabel">Damage</span><input id="item-dmg" type="text" value="0" placeholder="6" title="Number or range, e.g. 6-9"></label>
+        <label><span data-i18n="ui.itemSpdLabel">Speed (strikes per fight)</span><input id="item-spd" type="number" min="1" value="1" title="Number of strikes per fight exchange (default 1); armor/parry apply per strike"></label>
+        <label><span data-i18n="ui.itemProtLabel">Protection</span><input id="item-prot" type="number" min="0" value="0"></label>
+        <label><span data-i18n="ui.itemWarmLabel">Warmth</span><input id="item-warm" type="number" min="0" value="0"></label>
+        <label><span data-i18n="ui.itemHealLabel">Heal</span><input id="item-heal" type="number" min="0" value="0"></label>
+        <label><span data-i18n="ui.itemFeedLabel">Feed</span><input id="item-feed" type="number" min="0" value="0"></label>
+        <label><span data-i18n="ui.itemWeightLabel">Loot weight</span><input id="item-weight" type="number" min="1" value="10"></label>
+        <label><span data-i18n="ui.itemDurLabel">Durability (0 = consumed on use)</span><input id="item-dur" type="number" min="0" value="0"></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="item-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="item-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="event-modal">
+    <div class="modal-box wide">
+      <h3 id="event-modal-title">Event</h3>
+      <div class="field two-col">
+        <div>
+          <label for="event-id" data-i18n="ui.eventIdLabel">ID</label>
+          <input id="event-id" type="text" maxlength="40">
+        </div>
+        <div>
+          <label for="event-cat" data-i18n="ui.eventCatLabel">Category</label>
+          <select id="event-cat"></select>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="event-phase" data-i18n="ui.eventPhaseLabel">Phase</label>
+          <select id="event-phase"></select>
+        </div>
+        <div>
+          <label for="event-targets" data-i18n="ui.eventTargetsLabel">Targets</label>
+          <input id="event-targets" type="text" value="1">
+          <small class="hint" data-i18n="ui.targetsHint">1 = alone · 2 = pair · 3+ = group · or a range like 2-4</small>
+        </div>
+      </div>
+      <div class="field">
+        <label for="event-weight" data-i18n="ui.eventWeightLabel">Weight</label>
+        <input id="event-weight" type="number" min="1" value="10">
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventTplLabel">Text template</label>
+        <div id="event-tpls" class="tpls"></div>
+        <button class="btn ghost small" id="event-tpl-add" data-i18n="ui.addVariantBtn">+ add variant</button>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.eventFxSelfLabel">Effects on this tribute (stat, value)</label>
+          <div id="event-fxself" class="fxrows"></div>
+          <button class="btn ghost small" id="event-fxself-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+        <div>
+          <label data-i18n="ui.eventFxOtherLabel">Effects on others (stat, value)</label>
+          <div id="event-fxother" class="fxrows"></div>
+          <button class="btn ghost small" id="event-fxother-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="event-rel" data-i18n="ui.eventRelLabel">Relationship shift: self → others</label>
+          <input id="event-rel" type="number" step="1" value="0">
+        </div>
+        <div>
+          <label for="event-relrev" data-i18n="ui.eventRelRevLabel">Relationship shift: others → self</label>
+          <input id="event-relrev" type="number" step="1" value="0">
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="event-loot" data-i18n="ui.eventLootLabel">Loot — item ids (comma separated)</label>
+          <input id="event-loot" type="text" placeholder="knife, water">
+        </div>
+        <div>
+          <label data-i18n="ui.eventProfLabel">Proficiency changes (0 = none)</label>
+          <div id="event-prof" class="edit-stats"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventTargetSel">Target</label>
+        <div id="event-target" class="target-builder"></div>
+      </div>
+      <details class="script-section">
+        <summary data-i18n="ui.scriptHooks">Advanced script (JS)</summary>
+        <div class="field target-row"><label data-i18n="ui.scriptLang">Language</label>
+          <select id="event-script-lang" class="tb-mode">
+            <option value="js">JavaScript</option>
+            <option value="mini">Mini-language</option>
+          </select></div>
+        <div id="event-script-hooks" class="script-hooks" data-hooks-editor="event"></div>
+        <p class="hint" data-i18n="ui.scriptHint">...</p>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.outcomeHooks">Outcome texts</summary>
+        <div id="event-outcomes" class="outcome-list"></div>
+        <button class="btn ghost small" id="event-outcome-add" data-i18n="ui.outcomeAdd">+ add outcome</button>
+        <p class="hint" data-i18n="ui.outcomeHint">...</p>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.weaponTplsHooks">Weapon texts</summary>
+        <div id="event-wtpls" class="weapon-tpls"></div>
+        <p class="hint" data-i18n="ui.weaponTplsHint">...</p>
+      </details>
+      <div class="field">
+        <label for="event-advanced" data-i18n="ui.eventAdvancedLabel">Advanced (JSON): cond, scale</label>
+        <textarea id="event-advanced" rows="3" placeholder='{"cond":{...},"scale":{...}}'></textarea>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventSubsLabel">Sub-events</label>
+        <div id="event-subs" class="subs-list"></div>
+        <button class="btn ghost small" id="event-sub-add" data-i18n="ui.addSubBtn">+ add sub-event</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="event-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="event-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="sub-modal">
+    <div class="modal-box wide">
+      <h3 id="sub-modal-title">Sub-event</h3>
+      <div class="field two-col">
+        <div>
+          <label for="sub-targets" data-i18n="ui.eventTargetsLabel">Targets</label>
+          <input id="sub-targets" type="text" placeholder="">
+          <small class="hint" data-i18n="ui.targetsHint">1 = alone · 2 = pair · 3+ = group · or a range like 2-4</small>
+        </div>
+        <div>
+          <label for="sub-weight" data-i18n="ui.eventWeightLabel">Weight</label>
+          <input id="sub-weight" type="number" min="1" value="5">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventTplLabel">Text template</label>
+        <div id="sub-tpls" class="tpls"></div>
+        <button class="btn ghost small" id="sub-tpl-add" data-i18n="ui.addVariantBtn">+ add flavour text</button>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.eventFxSelfLabel">Effects on this tribute (stat, value)</label>
+          <div id="sub-fxself" class="fxrows"></div>
+          <button class="btn ghost small" id="sub-fxself-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+        <div>
+          <label data-i18n="ui.eventFxOtherLabel">Effects on others (stat, value)</label>
+          <div id="sub-fxother" class="fxrows"></div>
+          <button class="btn ghost small" id="sub-fxother-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="sub-rel" data-i18n="ui.eventRelLabel">Relationship shift: self → others</label>
+          <input id="sub-rel" type="number" step="1" value="0">
+        </div>
+        <div>
+          <label for="sub-relrev" data-i18n="ui.eventRelRevLabel">Relationship shift: others → self</label>
+          <input id="sub-relrev" type="number" step="1" value="0">
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="sub-loot" data-i18n="ui.eventLootLabel">Loot — item ids (comma separated)</label>
+          <input id="sub-loot" type="text" placeholder="knife, water">
+        </div>
+        <div>
+          <label data-i18n="ui.eventProfLabel">Proficiency changes (0 = none)</label>
+          <div id="sub-prof" class="edit-stats"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventTargetSel">Target</label>
+        <div id="sub-target" class="target-builder"></div>
+      </div>
+      <details class="script-section">
+        <summary data-i18n="ui.scriptHooks">Advanced script (JS)</summary>
+        <div class="field target-row"><label data-i18n="ui.scriptLang">Language</label>
+          <select id="sub-script-lang" class="tb-mode">
+            <option value="js">JavaScript</option>
+            <option value="mini">Mini-language</option>
+          </select></div>
+        <div id="sub-script-hooks" class="script-hooks" data-hooks-editor="sub"></div>
+        <p class="hint" data-i18n="ui.scriptHint">...</p>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.outcomeHooks">Outcome texts</summary>
+        <div id="sub-outcomes" class="outcome-list"></div>
+        <button class="btn ghost small" id="sub-outcome-add" data-i18n="ui.outcomeAdd">+ add outcome</button>
+        <p class="hint" data-i18n="ui.outcomeHint">...</p>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.weaponTplsHooks">Weapon texts</summary>
+        <div id="sub-wtpls" class="weapon-tpls"></div>
+        <p class="hint" data-i18n="ui.weaponTplsHint">...</p>
+      </details>
+      <div class="field">
+        <label for="sub-advanced" data-i18n="ui.eventAdvancedLabel">Advanced (JSON): cond, scale</label>
+        <textarea id="sub-advanced" rows="3" placeholder='{"cond":{...},"scale":{...},"phase":"night"}'></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="sub-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="sub-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="global-modal">
+    <div class="modal-box wide">
+      <h3 id="global-modal-title">Global Event</h3>
+      <div class="field two-col">
+        <div>
+          <label for="global-id" data-i18n="ui.eventIdLabel">ID</label>
+          <input id="global-id" type="text" maxlength="40">
+        </div>
+        <div class="field two-col">
+          <div>
+            <label for="global-chance" data-i18n="ui.globChance">Chance (%)</label>
+            <input id="global-chance" type="number" min="0" max="100" value="10">
+          </div>
+          <div>
+            <label for="global-weight" data-i18n="ui.eventWeightLabel">Weight</label>
+            <input id="global-weight" type="number" min="1" value="10">
+          </div>
+        </div>
+        <div>
+          <label for="global-maxtriggers" data-i18n="ui.globalMaxTriggers">Max triggers per game (blank = unlimited)</label>
+          <input id="global-maxtriggers" type="number" min="1" placeholder="∞">
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.globDur">Duration</label>
+          <select id="global-durtype"></select>
+          <input id="global-durvalue" type="number" min="1" value="1">
+        </div>
+        <div>
+          <label for="global-disable" data-i18n="ui.globalDisable">Disable events</label>
+          <input id="global-disable" type="text" placeholder="night_sleep_ok, cat:rest">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.globalStartTpl">Start text</label>
+        <div id="global-tpls" class="tpls"></div>
+        <button class="btn ghost small" id="global-tpl-add" data-i18n="ui.addVariantBtn">+ add flavour text</button>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.globalEndTpl">End text</label>
+        <div id="global-endtpls" class="tpls"></div>
+        <button class="btn ghost small" id="global-endtpl-add" data-i18n="ui.addVariantBtn">+ add flavour text</button>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.globalBuff">Buff gains (stat, value)</label>
+          <div id="global-buff" class="fxrows"></div>
+          <button class="btn ghost small" id="global-buff-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+        <div>
+          <label data-i18n="ui.globalNerf">Nerf (stat, value)</label>
+          <div id="global-nerf" class="fxrows"></div>
+          <button class="btn ghost small" id="global-nerf-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.globalReplaceDay">Replace — day events</label>
+          <div id="global-replace-day" class="mini-lists"></div>
+        </div>
+        <div>
+          <label data-i18n="ui.globalReplaceNight">Replace — night events</label>
+          <div id="global-replace-night" class="mini-lists"></div>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.globalAddonDay">Add-on — day events</label>
+          <div id="global-addon-day" class="mini-lists"></div>
+        </div>
+        <div>
+          <label data-i18n="ui.globalAddonNight">Add-on — night events</label>
+          <div id="global-addon-night" class="mini-lists"></div>
+        </div>
+      </div>
+      <details class="script-section" id="global-boss-section">
+        <summary data-i18n="ui.bossNPC">Boss NPC / Squad</summary>
+        <div class="field two-col">
+          <div>
+            <label for="global-boss-name" data-i18n="ui.bossName">Boss name</label>
+            <input id="global-boss-name" type="text" maxlength="40" placeholder="The Beast">
+          </div>
+          <div>
+            <label for="global-boss-emoji" data-i18n="ui.bossEmoji">Emoji</label>
+            <input id="global-boss-emoji" type="text" maxlength="8" value="\u{1F479}">
+          </div>
+        </div>
+        <div class="field two-col">
+          <div>
+            <label for="global-boss-count" data-i18n="ui.bossCount">Squad size</label>
+            <input id="global-boss-count" type="number" min="1" value="1">
+          </div>
+        </div>
+        <div class="field two-col">
+          <div>
+            <label for="global-boss-health" data-i18n="ui.bossHealth">Health</label>
+            <input id="global-boss-health" type="number" min="1" value="150">
+          </div>
+          <div>
+            <label for="global-boss-morale" data-i18n="ui.bossMorale">Morale</label>
+            <input id="global-boss-morale" type="number" min="0" max="100" value="80">
+          </div>
+        </div>
+        <div class="field two-col">
+          <div>
+            <label for="global-boss-combat" data-i18n="ui.bossCombat">Combat</label>
+            <input id="global-boss-combat" type="number" min="0" max="100" value="60">
+          </div>
+          <div>
+            <label for="global-boss-stealth" data-i18n="ui.bossStealth">Stealth</label>
+            <input id="global-boss-stealth" type="number" min="0" max="100" value="30">
+          </div>
+        </div>
+        <div class="field">
+          <label for="global-boss-defense" data-i18n="ui.bossDefense">Defense (reduces damage taken; grows with squad size)</label>
+          <input id="global-boss-defense" type="number" min="0" max="100" value="0">
+        </div>
+        <div class="field">
+          <label data-i18n="ui.bossWeapons">Weapons</label>
+          <div id="global-boss-weapons"></div>
+          <button class="btn ghost small" id="global-boss-weapon-add" data-i18n="ui.bossWeaponAdd">+ Add weapon</button>
+        </div>
+        <div class="field">
+          <label for="global-boss-dmgmult" data-i18n="ui.bossDmgMult">Damage dealt to tributes (multiplier)</label>
+          <input id="global-boss-dmgmult" type="number" min="0" max="5" step="0.1" value="1">
+        </div>
+        <div class="field">
+          <label for="global-boss-explosion" data-i18n="ui.bossExplosion">Death blast damage (damage to those who fought it when it dies)</label>
+          <input id="global-boss-explosion" type="number" min="0" value="0">
+        </div>
+        <div class="field">
+          <label data-i18n="ui.bossBehaviors">Behaviors</label>
+          <div class="checkbox-row">
+            <label class="checkbox"><input type="checkbox" id="global-boss-patrol" data-i18n="ui.bossPatrolB"> Patrol / attack tributes</label>
+            <label class="checkbox"><input type="checkbox" id="global-boss-drain" data-i18n="ui.bossDrainB"> Drain resources</label>
+            <label class="checkbox"><input type="checkbox" id="global-boss-steal" data-i18n="ui.bossStealB"> Steal from tributes</label>
+            <label class="checkbox"><input type="checkbox" id="global-boss-retaliate" checked data-i18n="ui.bossRetaliateB"> Retaliate when hunted</label>
+          </div>
+          <p class="hint" data-i18n="ui.bossHint">No behaviors = stationary. Tributes hunt it each phase — defeat it or wait out the duration. Unchecking "Retaliate" makes it unable to fight back (its only damage is the death blast).</p>
+        </div>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.scriptHooks">Advanced script (JS)</summary>
+        <div class="field target-row"><label data-i18n="ui.scriptLang">Language</label>
+          <select id="global-script-lang" class="tb-mode">
+            <option value="js">JavaScript</option>
+            <option value="mini">Mini-language</option>
+          </select></div>
+        <div id="global-script-hooks" class="script-hooks" data-hooks-editor="global"></div>
+        <p class="hint" data-i18n="ui.scriptHint">...</p>
+      </details>
+      <div class="modal-actions">
+        <button class="btn ghost" id="global-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="global-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="mini-modal">
+    <div class="modal-box wide">
+      <h3 id="mini-modal-title">Event</h3>
+      <div class="field two-col">
+        <div>
+          <label for="mini-targets" data-i18n="ui.eventTargetsLabel">Targets</label>
+          <input id="mini-targets" type="text" placeholder="">
+          <small class="hint" data-i18n="ui.targetsHint">1 = alone · 2 = pair · 3+ = group · or a range like 2-4</small>
+        </div>
+        <div>
+          <label for="mini-weight" data-i18n="ui.eventWeightLabel">Weight</label>
+          <input id="mini-weight" type="number" min="1" value="5">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventTplLabel">Text template</label>
+        <div id="mini-tpls" class="tpls"></div>
+        <button class="btn ghost small" id="mini-tpl-add" data-i18n="ui.addVariantBtn">+ add flavour text</button>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label data-i18n="ui.eventFxSelfLabel">Effects on this tribute (stat, value)</label>
+          <div id="mini-fxself" class="fxrows"></div>
+          <button class="btn ghost small" id="mini-fxself-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+        <div>
+          <label data-i18n="ui.eventFxOtherLabel">Effects on others (stat, value)</label>
+          <div id="mini-fxother" class="fxrows"></div>
+          <button class="btn ghost small" id="mini-fxother-add" data-i18n="ui.addStatBtn">+ add stat</button>
+        </div>
+      </div>
+      <div class="field two-col">
+        <div>
+          <label for="mini-rel" data-i18n="ui.eventRelLabel">Relationship shift: self → others</label>
+          <input id="mini-rel" type="number" step="1" value="0">
+        </div>
+        <div>
+          <label for="mini-relrev" data-i18n="ui.eventRelRevLabel">Relationship shift: others → self</label>
+          <input id="mini-relrev" type="number" step="1" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label for="mini-loot" data-i18n="ui.eventLootLabel">Loot — item ids (comma separated)</label>
+        <input id="mini-loot" type="text" placeholder="knife, water">
+      </div>
+      <div class="field">
+        <label data-i18n="ui.eventTargetSel">Target</label>
+        <div id="mini-target" class="target-builder"></div>
+      </div>
+      <details class="script-section">
+        <summary data-i18n="ui.scriptHooks">Advanced script (JS)</summary>
+        <div class="field target-row"><label data-i18n="ui.scriptLang">Language</label>
+          <select id="mini-script-lang" class="tb-mode">
+            <option value="js">JavaScript</option>
+            <option value="mini">Mini-language</option>
+          </select></div>
+        <div id="mini-script-hooks" class="script-hooks" data-hooks-editor="mini"></div>
+        <p class="hint" data-i18n="ui.scriptHint">...</p>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.outcomeHooks">Outcome texts</summary>
+        <div id="mini-outcomes" class="outcome-list"></div>
+        <button class="btn ghost small" id="mini-outcome-add" data-i18n="ui.outcomeAdd">+ add outcome</button>
+        <p class="hint" data-i18n="ui.outcomeHint">...</p>
+      </details>
+      <details class="script-section">
+        <summary data-i18n="ui.weaponTplsHooks">Weapon texts</summary>
+        <div id="mini-wtpls" class="weapon-tpls"></div>
+        <p class="hint" data-i18n="ui.weaponTplsHint">...</p>
+      </details>
+      <div class="modal-actions">
+        <button class="btn ghost" id="mini-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="mini-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="personality-modal">
+    <div class="modal-box">
+      <h3 id="personality-modal-title">Personality</h3>
+      <div class="field two-col">
+        <div>
+          <label for="pers-id" data-i18n="ui.eventIdLabel">ID</label>
+          <input id="pers-id" type="text" maxlength="30">
+        </div>
+        <div>
+          <label for="pers-name" data-i18n="ui.persName">Name</label>
+          <input id="pers-name" type="text" maxlength="24">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.persWeights">Action weights (how much this personality prefers each action)</label>
+        <div id="pers-weights" class="edit-stats"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="personality-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="personality-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="ability-modal">
+    <div class="modal-box">
+      <h3 id="ability-modal-title">Ability</h3>
+      <div class="field two-col">
+        <div>
+          <label for="ab-id" data-i18n="ui.eventIdLabel">ID</label>
+          <input id="ab-id" type="text" maxlength="30">
+        </div>
+        <div>
+          <label for="ab-name" data-i18n="ui.abName">Name</label>
+          <input id="ab-name" type="text" maxlength="24">
+        </div>
+      </div>
+      <div class="field">
+        <label for="ab-cond" data-i18n="ui.abCond">Trigger condition (optional, mini-language: self.health &lt; 30, self female, hasItem self knife)</label>
+        <input id="ab-cond" type="text" maxlength="60" placeholder="self.health < 30">
+      </div>
+      <div class="field">
+        <label data-i18n="ui.persWeights">Action weights</label>
+        <div id="ab-weights" class="edit-stats"></div>
+      </div>
+      <div class="field two-col">
+        <div><label for="ab-dealt" data-i18n="ui.abDealt">Damage dealt (multiplier)</label><input id="ab-dealt" type="number" step="0.05" min="0.5" max="2" value="1"></div>
+        <div><label for="ab-taken" data-i18n="ui.abTaken">Damage taken (multiplier)</label><input id="ab-taken" type="number" step="0.05" min="0.5" max="2" value="1"></div>
+      </div>
+      <div class="field two-col">
+        <div><label for="ab-food" data-i18n="ui.abUpkeepFood">Food upkeep change</label><input id="ab-food" type="number" step="1" value="0"></div>
+        <div><label for="ab-energy" data-i18n="ui.abUpkeepEnergy">Energy upkeep change</label><input id="ab-energy" type="number" step="1" value="0"></div>
+      </div>
+      <div class="field two-col">
+        <div><label for="ab-cold" data-i18n="ui.abCold">Cold resistance</label><input id="ab-cold" type="number" step="1" min="0" value="0"></div>
+        <div><label for="ab-scav" data-i18n="ui.abScavenge">Scavenge chance bonus</label><input id="ab-scav" type="number" step="0.05" min="0" value="0"></div>
+      </div>
+      <div class="field two-col">
+        <div><label for="ab-target" data-i18n="ui.abTarget">Targeting weight (0.5 = rarely picked)</label><input id="ab-target" type="number" step="0.1" min="0.1" max="3" value="1"></div>
+        <div></div>
+      </div>
+      <div class="field">
+        <label data-i18n="ui.abExtraAction">Extra action at low stat (e.g. berserk at low health)</label>
+        <div class="target-row">
+          <select id="ab-xa-stat">
+            <option value="health">Health</option>
+            <option value="energy">Energy</option>
+            <option value="food">Food</option>
+            <option value="morale">Morale</option>
+          </select>
+          <input id="ab-xa-below" type="number" min="0" max="100" value="30" title="below this value">
+          <input id="ab-xa-max" type="number" min="1" value="1" title="max extra actions per day">
+        </div>
+      </div>
+      <details class="script-section">
+        <summary data-i18n="ui.scriptHooks">Advanced script</summary>
+        <div class="field target-row"><label data-i18n="ui.scriptLang">Language</label>
+          <select id="ab-script-lang" class="tb-mode">
+            <option value="js">JavaScript</option>
+            <option value="mini">Mini-language</option>
+          </select></div>
+        <div id="ab-script-hooks" class="script-hooks" data-hooks-editor="ability"></div>
+      </details>
+      <div class="modal-actions">
+        <button class="btn ghost" id="ability-cancel" data-i18n="ui.btnCancel">Cancel</button>
+        <button class="btn gold" id="ability-save" data-i18n="ui.btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

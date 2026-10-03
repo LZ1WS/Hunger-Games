@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Code Editor — Reference</title>
+  <style>
+    :root {
+      --bg: #0c0d12;
+      --panel: #15161d;
+      --panel2: #1b1d26;
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #e8e6e0;
+      --muted: #9a978e;
+      --gold: #d4af37;
+      --gold2: #f2d47a;
+      --green: #5ecfa8;
+      --red: #e05a4a;
+      --blue: #6aa9e0;
+      --code: #0f1118;
+      --kw: #f2d47a;
+      --str: #8fdfa8;
+      --fn: #6aa9e0;
+      --num: #e0b84b;
+      --com: #6b6f78;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse at 20% 0%, rgba(212, 175, 55, 0.06), transparent 50%), radial-gradient(ellipse at 90% 100%, rgba(90, 40, 40, 0.12), transparent 50%); }
+
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 22px 80px; }
+    header.docs { margin-bottom: 26px; }
+    header.docs .flame { font-size: 34px; }
+    header.docs h1 { font-size: 26px; margin: 6px 0 2px; color: var(--gold2); letter-spacing: 1px; }
+    header.docs .sub { color: var(--muted); font-size: 13px; }
+
+    nav.toc {
+      position: sticky; top: 10px; z-index: 10;
+      background: rgba(12, 13, 18, 0.92); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 16px; margin-bottom: 24px; backdrop-filter: blur(6px);
+    }
+    nav.toc .toc-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    nav.toc ol { margin: 0; padding-left: 20px; columns: 2; }
+    nav.toc a { color: var(--gold); text-decoration: none; font-size: 13px; }
+    nav.toc a:hover { color: var(--gold2); text-decoration: underline; }
+
+    section.doc { margin: 34px 0; }
+    h2 { color: var(--gold2); font-size: 21px; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin: 40px 0 16px; }
+    h3 { color: var(--gold); font-size: 16px; margin: 26px 0 10px; }
+    h4 { font-size: 14px; margin: 18px 0 8px; color: var(--text); }
+    p, li { font-size: 14px; }
+    code { font-family: Consolas, "Cascadia Code", monospace; font-size: 13px; background: var(--code); padding: 1px 6px; border-radius: 5px; color: var(--gold2); }
+    pre {
+      background: var(--code); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; font-size: 13px; line-height: 1.55;
+    }
+    pre code { background: none; padding: 0; color: var(--text); }
+    .k { color: var(--kw); }
+    .s { color: var(--str); }
+    .f { color: var(--fn); }
+    .n { color: var(--num); }
+    .c { color: var(--com); font-style: italic; }
+
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: var(--panel2); color: var(--gold2); font-weight: 600; white-space: nowrap; }
+    td code { white-space: nowrap; }
+    tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
+
+    .note { border-left: 3px solid var(--gold); background: rgba(212, 175, 55, 0.08); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13px; margin: 14px 0; }
+    .warn { border-left: 3px solid var(--red); background: rgba(224, 90, 74, 0.08); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13px; margin: 14px 0; }
+    .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .card h4 { margin: 0 0 6px; color: var(--gold); }
+    footer { margin-top: 50px; color: var(--muted); font-size: 12px; text-align: center; }
+    a.top { color: var(--gold); font-size: 12px; text-decoration: none; float: right; }
+    a.top:hover { color: var(--gold2); }
+    .badge { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 10px; margin-left: 6px; vertical-align: 1px; }
+    .badge.js { background: rgba(212, 175, 55, 0.15); color: var(--gold2); border: 1px solid rgba(212, 175, 55, 0.4); }
+    .badge.mini { background: rgba(106, 169, 224, 0.15); color: #8fc3f2; border: 1px solid rgba(106, 169, 224, 0.4); }
+    @media (max-width: 700px) { nav.toc ol { columns: 1; } th, td { white-space: normal; } }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="wrap">
+
+    <header class="docs">
+      <span class="flame">🔥</span>
+      <h1>Code Editor — Reference</h1>
+      <div class="sub">Scripting guide for events, global events, sub-events and add-ons</div>
+    </header>
+
+    <nav class="toc">
+      <div class="toc-title">Contents</div>
+      <ol>
+        <li><a href="#where">Where scripts live</a></li>
+        <li><a href="#languages">The two languages</a></li>
+        <li><a href="#context">The script context</a></li>
+        <li><a href="#mini">Mini-language</a></li>
+        <li><a href="#js">JavaScript helpers</a></li>
+        <li><a href="#hooks">Global event hooks</a></li>
+        <li><a href="#outcome">Outcome text conditions</a></li>
+        <li><a href="#errors">Errors &amp; safety</a></li>
+        <li><a href="#examples">Examples</a></li>
+      </ol>
+    </nav>
+
+    <section class="doc" id="where">
+      <a class="top" href="#">▲ top</a>
+      <h2>1. Where scripts live</h2>
+      <p>The "code editor" powers the scriptable parts of the game. A script can be attached to:</p>
+      <table>
+        <thead><tr><th>Place</th><th>Hook</th><th>Context</th><th>Editor</th></tr></thead>
+        <tbody>
+          <tr><td>Regular event</td><td><code>script</code> / <code>script.onEvent</code></td><td>fires during resolution</td><td>Event editor → "Advanced script"</td></tr>
+          <tr><td>Sub-event</td><td><code>script</code></td><td>fires when the sub fires</td><td>Sub-event editor</td></tr>
+          <tr><td>Add-on / replace mini-event</td><td><code>script</code></td><td>fires per tribute</td><td>Mini-event editor</td></tr>
+          <tr><td>Global event</td><td><code>script.onStart/onDay/onNight/onDeath/onEnd</code></td><td>see <a href="#hooks">hooks</a></td><td>Global event editor → "Advanced script"</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc" id="languages">
+      <a class="top" href="#">▲ top</a>
+      <h2>2. The two languages</h2>
+      <div class="grid2">
+        <div class="card">
+          <h4>Mini-language <span class="badge mini">mini</span></h4>
+          <p>A safe, line-based language — one statement per line, no brackets. Ideal for most content. Covers logging, conditionals, item grants and alliance actions.</p>
+        </div>
+        <div class="card">
+          <h4>JavaScript <span class="badge js">js</span></h4>
+          <p>Full JavaScript running in a sandboxed <code>with(ctx)</code> scope with helper functions. For advanced authors. Errors are caught and never crash the game.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc" id="context">
+      <a class="top" href="#">▲ top</a>
+      <h2>3. The script context</h2>
+      <p>Both languages run with these variables in scope:</p>
+      <table>
+        <thead><tr><th>Variable</th><th>Available in</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>state</code></td><td>everywhere</td><td>The whole game state: <code>tributes</code>, <code>settings</code>, <code>map</code>, <code>log</code>, <code>day</code>, <code>phase</code>…</td></tr>
+          <tr><td><code>self</code></td><td>event scripts</td><td>The acting tribute (the event's subject).</td></tr>
+          <tr><td><code>other</code></td><td>event scripts</td><td>The primary other tribute, or <code>null</code> for solo events.</td></tr>
+          <tr><td><code>others</code></td><td>event scripts</td><td>Array of all other tributes involved.</td></tr>
+          <tr><td><code>event</code></td><td>event scripts</td><td>The event object being resolved.</td></tr>
+          <tr><td><code>g</code></td><td>global hooks</td><td>The active global event instance (<code>g.def</code>, <code>g.boss</code>, <code>g.remaining</code>…).</td></tr>
+          <tr><td><code>memory</code></td><td>global hooks</td><td>Persistent object for this global — survives for its whole duration, resets when it ends.</td></tr>
+          <tr><td><code>day</code>, <code>phase</code></td><td>everywhere</td><td>Current day number and phase (<code>"day"</code>/<code>"night"</code>/…).</td></tr>
+          <tr><td><code>death</code></td><td><code>onDeath</code> only</td><td><code>{ tribute, killer }</code> — the fallen tribute and who killed them (<code>killer</code> may be <code>null</code>).</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc" id="mini">
+      <a class="top" href="#">▲ top</a>
+      <h2>4. Mini-language</h2>
+      <p>One statement per line. Blank lines and lines starting with <code>#</code> or <code>//</code> are ignored.</p>
+
+      <h3>Statements</h3>
+      <table>
+        <thead><tr><th>Statement</th><th>Example</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>set &lt;name&gt; to &lt;value&gt;</code></td><td><code>set target to random</code></td><td>Store a value in <code>memory</code> (<code>true</code>/<code>false</code>, <code>random</code>, <code>randomOther</code>, or another ref).</td></tr>
+          <tr><td><code>log "…"</code></td><td><code>log "{self} finds a cache!"</code></td><td>Write a <code>script</code>-category log line. Supports placeholders (below).</td></tr>
+          <tr><td><code>grant &lt;ref&gt; &lt;items&gt;</code></td><td><code>grant self medkit,knife</code></td><td>Give specific items to a tribute (comma or space separated ids).</td></tr>
+          <tr><td><code>reward &lt;ref&gt; &lt;items&gt;</code></td><td><code>reward killer medkit,grenade</code></td><td>Give a <em>random</em> item from the list.</td></tr>
+          <tr><td><code>ally &lt;ref&gt; &lt;ref&gt;</code></td><td><code>ally self other</code></td><td>Forge an alliance between two tributes (Hunger Games+).</td></tr>
+          <tr><td><code>leave &lt;ref&gt;</code></td><td><code>leave self</code></td><td>The tribute leaves their alliance.</td></tr>
+          <tr><td><code>trigger &lt;category&gt;</code></td><td><code>trigger fight</code></td><td>Fire a random regular event of that category (recursion-guarded).</td></tr>
+          <tr><td><code>spawn &lt;globalId&gt;</code></td><td><code>spawn the_beast</code></td><td>Spawn a global event by its id.</td></tr>
+          <tr><td><code>fight &lt;ref&gt; &lt;ref&gt;</code></td><td><code>fight other self</code></td><td>Force a fight event between two tributes (like being caught while stealing).</td></tr>
+          <tr><td><code>if &lt;condition&gt;</code> … <code>end</code></td><td><code>if killer is target</code> … <code>end</code></td><td>Conditional block. Optional <code>else</code> between the branches.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>References</h3>
+      <table>
+        <thead><tr><th>Ref</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>self</code>, <code>other</code>, <code>others</code></td><td>The acting tribute, primary other, and the full group. <code>others</code> can be **indexed**: <code>others[0]</code>, <code>others[1]</code>… (e.g. <code>grant others[0] medkit</code>, <code>if others[1].health &lt; 30</code>, <code>log "{others[0]}"</code>).</td></tr>
+          <tr><td><code>killer</code>, <code>victim</code></td><td>Only in <code>onDeath</code> hooks (<code>death.killer</code> / <code>death.tribute</code>).</td></tr>
+          <tr><td><code>target</code></td><td>The tribute stored in <code>memory.target</code> (set via <code>set target to …</code>).</td></tr>
+          <tr><td><code>random</code>, <code>randomOther</code></td><td>A random alive tribute (<code>randomOther</code> excludes the acting one where applicable).</td></tr>
+          <tr><td><code>&lt;name&gt;</code></td><td>Any <code>memory</code> variable you set earlier.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Conditions (for <code>if</code>)</h3>
+      <table>
+        <thead><tr><th>Form</th><th>Examples</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;ref&gt; is &lt;ref/none/true/false&gt;</code></td><td><code>victim is target</code>, <code>killer is none</code>, <code>claimed is true</code></td></tr>
+          <tr><td><code>&lt;ref&gt; is not &lt;…&gt;</code></td><td><code>killer is not none</code></td></tr>
+          <tr><td><code>&lt;ref&gt; alive / dead</code></td><td><code>target alive</code></td></tr>
+          <tr><td><code>&lt;ref&gt;.&lt;stat&gt; &lt;op&gt; &lt;n&gt;</code></td><td><code>self.health &lt; 30</code>, <code>other.energy &gt;= 40</code></td></tr>
+          <tr><td><code>&lt;ref&gt; rel &lt;ref&gt; &lt;op&gt; &lt;n&gt;</code></td><td><code>other rel self &gt;= 20</code>, <code>self rel other &lt; -30</code> (how the first feels about the second)</td></tr>
+          <tr><td><code>&lt;ref&gt; &lt;gender&gt;</code></td><td><code>other female</code>, <code>victim male</code>, <code>self non-binary</code></td></tr>
+          <tr><td><code>&lt;ref&gt; &lt;personality&gt;</code></td><td><code>other warrior</code>, <code>self strategist</code></td></tr>
+          <tr><td><code>hasItem &lt;ref&gt; &lt;itemId&gt;</code></td><td><code>hasItem self medkit</code></td></tr>
+          <tr><td><code>hasCat &lt;ref&gt; &lt;category&gt;</code></td><td><code>hasCat self medical</code></td></tr>
+        </tbody>
+      </table>
+      <div class="note">Operators: <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code> <code>==</code> <code>!=</code> <code>=</code>. Stats use attribute keys like <code>health</code>, <code>energy</code>, <code>food</code>, <code>combat</code>, <code>stealth</code>…</div>
+
+      <h3>Log placeholders</h3>
+      <p>Inside <code>log "…"</code> strings, wrap any ref to insert its name:</p>
+      <p><code>{self}</code> <code>{other}</code> <code>{others}</code> <code>{others[0]}</code> <code>{killer}</code> <code>{victim}</code> <code>{target}</code> <code>{boss}</code></p>
+      <div class="note"><code>{others}</code> joins all names ("A, B and C"); <code>{others[N]}</code> picks a specific member by index (out of range → "…"). Works in both mini <code>log</code> strings and event <strong>flavour templates</strong>.</div>
+      <pre><code><span class="c"># example</span>
+set target to random
+log <span class="s">"A bounty is placed on {target}! Kill them for a reward."</span></code></pre>
+    </section>
+
+    <section class="doc" id="js">
+      <a class="top" href="#">▲ top</a>
+      <h2>5. JavaScript helpers</h2>
+      <p>Available in all script contexts. Use them directly — they are injected into scope.</p>
+      <table>
+        <thead><tr><th>Helper</th><th>Signature</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>log</code></td><td><code>log(text, changes?)</code></td><td>Write a <code>script</code> log line.</td></tr>
+          <tr><td><code>tr</code></td><td><code>tr(key, vars?)</code></td><td>Translate a locale key (ui+names+engine merged) in the active language, with <code>{var}</code> substitution — e.g. <code>tr("win", { name: self.name })</code>.</td></tr>
+          <tr><td><code>grant</code></td><td><code>grant(t, itemId)</code></td><td>Give one item to a tribute.</td></tr>
+          <tr><td><code>grantLoot</code></td><td><code>grantLoot(t, [ids])</code></td><td>Give a random item from the list.</td></tr>
+          <tr><td><code>add</code> / <code>set</code> / <code>get</code></td><td><code>(t, stat, delta|value)</code></td><td>Adjust / set / read an attribute (clamped 0–100).</td></tr>
+          <tr><td><code>addRel</code> / <code>setRel</code></td><td><code>addRel(a, b, delta)</code> / <code>setRel(a, b, value)</code></td><td>Adjust by delta / set exactly how tribute <code>a</code> feels about <code>b</code> (clamped −100…100).</td></tr>
+          <tr><td><code>pickTribute</code></td><td><code>pickTribute({cond?, excludeSelf?})</code></td><td>A random alive tribute matching the condition object.</td></tr>
+          <tr><td><code>matches</code></td><td><code>matches(t, cond)</code></td><td>Does the tribute match a condition object?</td></tr>
+          <tr><td><code>any</code></td><td><code>any(cond)</code></td><td>Does any alive tribute match?</td></tr>
+          <tr><td><code>byId</code></td><td><code>byId(id)</code></td><td>Look up a tribute by id.</td></tr>
+          <tr><td><code>isAlive</code></td><td><code>isAlive(t)</code></td><td>Is the tribute alive?</td></tr>
+          <tr><td><code>hasItem</code> / <code>hasCat</code></td><td><code>(t, id|category)</code></td><td>Inventory checks.</td></tr>
+          <tr><td><code>rand</code> / <code>choose</code></td><td><code>rand(min, max)</code> / <code>choose(arr)</code></td><td>Random integer / random array element.</td></tr>
+          <tr><td><code>ally</code> / <code>leaveAlliance</code></td><td><code>ally(a, b)</code> / <code>leaveAlliance(t)</code></td><td>Alliance actions (Hunger Games+).</td></tr>
+          <tr><td><code>triggerEvent</code> / <code>triggerGlobal</code> / <code>fight</code></td><td><code>triggerEvent(cat, tributeId?)</code> / <code>triggerGlobal(id)</code> / <code>fight(a, b)</code></td><td>Fire a random regular event of a category (on a tribute, default random), spawn a global event by id, or force a **fight between two specific tributes** — all recursion-guarded.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Condition objects</h3>
+      <p>A condition object matches a tribute when <em>all</em> fields pass:</p>
+      <pre><code><span class="c">// all fields optional; unknown stat names fail (never crash)</span>
+{
+  <span class="k">skill</span>: { name: <span class="s">"combat"</span>, min: <span class="n">60</span>, max: <span class="n">100</span> },
+  <span class="k">stat</span>: { name: <span class="s">"morale"</span>, min: <span class="n">30</span> },
+  <span class="k">proficiency</span>: { name: <span class="s">"melee"</span>, min: <span class="n">50</span> },
+  <span class="k">personality</span>: <span class="s">"warrior"</span>,
+  <span class="k">gender</span>: <span class="s">"female"</span>,
+  <span class="k">hasItem</span>: <span class="s">"medkit"</span>,
+  <span class="k">hasCat</span>: <span class="s">"medical"</span>
+}</code></pre>
+
+      <h3>Example (event script, JS)</h3>
+      <pre><code><span class="c">// onEvent of a custom event</span>
+<span class="k">if</span> (hasCat(self, <span class="s">"medical"</span>)) {
+  add(self, <span class="s">"morale"</span>, <span class="n">10</span>);
+  grant(self, <span class="s">"bandage"</span>);
+  log(<span class="s">"{self} patches themselves up."</span>);
+} <span class="k">else</span> {
+  add(self, <span class="s">"health"</span>, <span class="n">-8</span>);
+  log(<span class="s">"{self} finds no medicine."</span>);
+}</code></pre>
+    </section>
+
+    <section class="doc" id="hooks">
+      <a class="top" href="#">▲ top</a>
+      <h2>6. Global event hooks</h2>
+      <p>A global event's script is an object with up to five hooks. Each fires at a different point in the global's life.</p>
+      <table>
+        <thead><tr><th>Hook</th><th>When</th><th>Extra context</th></tr></thead>
+        <tbody>
+          <tr><td><code>onStart</code></td><td>When the global triggers.</td><td><code>state, g, memory</code></td></tr>
+          <tr><td><code>onDay</code> / <code>onNight</code></td><td>Each phase while active.</td><td><code>state, g, memory</code></td></tr>
+          <tr><td><code>onDeath</code></td><td>Whenever a tribute dies while active.</td><td><code>death = { tribute, killer }</code> → refs <code>victim</code>, <code>killer</code></td></tr>
+          <tr><td><code>onDamage</code></td><td>Whenever a tribute takes health damage while active, <em>and</em> whenever the Boss itself is hit by a hunter.</td><td><code>damage = { target, amount, attacker, cause }</code>; refs <code>victim</code>/<code>killer</code> map to target/attacker. If <code>damage.target</code> has <code>maxHealth</code> it's the Boss (use <code>boss()</code>/<code>bossName()</code>)</td></tr>
+          <tr><td><code>onSlay</code></td><td>The moment a Boss is slain — before the Boss Slayer winners are decided.</td><td><code>state, g, memory</code>; <code>g.boss</code> holds <code>participants</code> (everyone who fought it)</td></tr>
+          <tr><td><code>onEnd</code></td><td>When the global ends (duration expired, or a boss was slain).</td><td><code>state, g, memory</code></td></tr>
+        </tbody>
+      </table>
+      <div class="note"><code>g.memory</code> is the <code>memory</code> object — share state between hooks. It persists while the global is active and resets when it ends.</div>
+
+      <h3>Example — a modular death blast (JS, onSlay)</h3>
+      <pre><code><span class="c">// fired the moment the Boss dies, before winners are decided</span>
+<span class="k">for</span> (<span class="k">const</span> id <span class="k">of</span> Object.keys(g.boss.participants || {})) {
+  <span class="k">const</span> t = byId(id);
+  <span class="k">if</span> (t && isAlive(t)) {
+    add(t, <span class="s">"health"</span>, -<span class="n">60</span>);
+    log(t.name + <span class="s">" is caught in the blast!"</span>);
+  }
+}</code></pre>
+      <div class="note">In <strong>Boss Slayer</strong> mode the game ends only when <strong>all</strong> active bosses are dead. Every tribute who fought any slain boss is accumulated in <code>state.bossSlayers</code>; at the final slay the winners are whoever is alive with health &gt; 0 among them — so an <code>onSlay</code> blast here can kill wounded fighters and deny them the win.</div>
+
+      <h4>Example — react to the active boss (JS)</h4>
+      <pre><code><span class="c">// boss() returns the active boss entity (or null); bossName() its localized name</span>
+<span class="k">const</span> b = boss();
+<span class="k">if</span> (b && b.health &lt; b.maxHealth * <span class="n">0.5</span>) {
+  log(bossName() + <span class="s">" is wounded! Its morale falters."</span>);
+  b.morale = Math.max(<span class="n">0</span>, b.morale - <span class="n">10</span>);
+}</code></pre>
+      <div class="note">In mini-language, use the <code>{boss}</code> log placeholder instead: <code>log "The {boss} is wounded!"</code></div>
+
+      <h4>Example — onDamage reaction (JS)</h4>
+      <pre><code><span class="c">// fires when a tribute takes damage AND when the Boss is hit by a hunter</span>
+<span class="k">if</span> (damage.target &amp;&amp; damage.target.maxHealth) {
+  log(bossName() + <span class="s">" was struck for "</span> + damage.amount + <span class="s">" by "</span> + (damage.attacker ? damage.attacker.name : <span class="s">"?"</span>) + <span class="s">" — "</span> + damage.remainingCount + <span class="s">" units left"</span>);
+} <span class="k">else</span> {
+  log(damage.target.name + <span class="s">" took "</span> + damage.amount + <span class="s">" damage."</span>);
+}</code></pre>
+      <div class="note"><code>damage.remainingCount</code> (boss hits only) is the squad units still standing: <code>Math.ceil(health × count / maxHealth)</code>. The Threat panel shows it live too (e.g. <code>×2/3</code>) and lists every active boss (up to 4 — the first as a full card, the rest compact, with a "+N more…" footer if exceeded).</div>
+
+      <h3>Ability hooks (per-tribute)</h3>
+      <p>Abilities can carry a <code>script</code> object with hooks that fire for the tribute's own state. Context is <code>self</code>, <code>state</code>, <code>memory</code> (a per-tribute object, reset each game), and all helpers.</p>
+      <table>
+        <thead><tr><th>Hook</th><th>When</th><th>Extra context</th></tr></thead>
+        <tbody>
+          <tr><td><code>onEvent</code> / <code>postEvent</code></td><td>an event involves the tribute (before / after its effects)</td><td><code>event = { id, cat, phase }</code>; <code>other</code> = the other participant</td></tr>
+          <tr><td><code>onDay</code> / <code>onNight</code></td><td>each phase</td><td>—</td></tr>
+          <tr><td><code>onDamage</code></td><td>the tribute takes damage</td><td><code>damage = { target, amount, attacker, cause }</code></td></tr>
+          <tr><td><code>onDeal</code></td><td>the tribute deals damage</td><td><code>damage = { target, amount, cause }</code></td></tr>
+          <tr><td><code>onKill</code></td><td>the tribute kills someone</td><td><code>death = { tribute, killer }</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Example — an ability reacting to events (JS)</h3>
+      <pre><code><span class="c">// onEvent of the ability's script</span>
+<span class="k">if</span> (event.cat === <span class="s">"fight"</span> &amp;&amp; other) {
+  add(self, <span class="s">"morale"</span>, -<span class="n">3</span>);
+  log(<span class="s">"Battle nerves: "</span> + self.name);
+}</code></pre>
+
+      <h3>The default bounty global (mini-language)</h3>
+      <pre><code><span class="c">onStart:</span>
+set target to random
+log <span class="s">"A bounty is placed on {target}! Kill them today for a reward."</span>
+
+<span class="c">onDeath:</span>
+if victim is target
+  set claimed to true
+  if killer is not none
+    reward killer medkit,grenade,rations,shield
+    log <span class="s">"{killer} claimed the bounty on {victim}!"</span>
+  end
+  if killer is none
+    log <span class="s">"The bounty target has died, but no one collected the reward."</span>
+  end
+end
+
+<span class="c">onEnd:</span>
+if claimed is not true
+  log <span class="s">"The bounty on {target} has expired. No reward was paid."</span>
+end</code></pre>
+    </section>
+
+    <section class="doc" id="outcome">
+      <a class="top" href="#">▲ top</a>
+      <h2>7. Outcome text conditions</h2>
+      <p>Events (and sub-events) can have <strong>outcome texts</strong> — an ordered list of <code>{ when, tpl }</code> pairs evaluated <em>after</em> effects are applied. The first matching <code>when</code> wins; an entry with no <code>when</code> is the fallback. If none match, the main template is used.</p>
+      <p>Conditions use the same mini-language, with <code>self</code> and <code>other</code>:</p>
+      <table>
+        <thead><tr><th>Example condition</th><th>Matches when…</th></tr></thead>
+        <tbody>
+          <tr><td><code>other.dead</code> / <code>self.dead</code></td><td>The other / the actor died from this event.</td></tr>
+          <tr><td><code>other.health &lt; 30</code></td><td>The other is left badly wounded.</td></tr>
+          <tr><td><code>other rel self &gt;= 20</code></td><td>The other feels positively about the actor (relationships −100…100).</td></tr>
+          <tr><td><code>self.health &gt; 50</code></td><td>The actor came through it unharmed.</td></tr>
+          <tr><td><code>other female</code> / <code>other warrior</code></td><td>Gender / personality of the other.</td></tr>
+          <tr><td><code>hasItem self medkit</code> / <code>hasCat self medical</code></td><td>Inventory checks.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="doc" id="errors">
+      <a class="top" href="#">▲ top</a>
+      <h2>8. Errors &amp; safety</h2>
+      <ul>
+        <li>Scripts are sandboxed and can never crash the game. A thrown error is written as a <code>script</code> log line and printed to the server console.</li>
+        <li>Unknown attribute / skill / proficiency names are <strong>silently ignored</strong> — a typo means a no-op, not an error. Watch your spelling.</li>
+        <li>Attribute keys: <code>health energy food morale supplies combat survival craft charm stealth</code> (0–100).</li>
+        <li>Proficiencies: <code>melee ranged explosive tool medical</code> (0–100). Relationships run −100…100.</li>
+        <li>Item ids come from the <strong>item catalog</strong> (<code>config/items.json</code> or the ⚙ Game Content → Items editor).</li>
+        <li>In the mini-language, <code>self</code>/<code>other</code> are only defined in <em>event</em> scripts — global hooks use <code>random</code>/<code>randomOther</code> or stored <code>memory</code> refs instead.</li>
+      </ul>
+    </section>
+
+    <section class="doc" id="examples">
+      <a class="top" href="#">▲ top</a>
+      <h2>9. Examples</h2>
+
+      <h3>A "care package" add-on mini-event (JS)</h3>
+      <pre><code><span class="c">// runs for each alive tribute each phase</span>
+<span class="k">if</span> (rand(<span class="n">1</span>, <span class="n">10</span>) === <span class="n">1</span>) {
+  grantLoot(self, [<span class="s">"water"</span>, <span class="s">"rations"</span>, <span class="s">"bandage"</span>, <span class="s">"firewood"</span>]);
+  log(<span class="s">"{self} finds a sponsor care package."</span>);
+}</code></pre>
+
+      <h3>A boss that punishes the unprepared (mini, onDay)</h3>
+      <pre><code><span class="c">onDay:</span>
+set target to random
+if hasCat target armor
+  log <span class="s">"{target} hunkers down as the Beast prowls past."</span>
+else
+  grant target medkit
+  log <span class="s">"{target} is caught in the open by the Beast!"</span>
+end</code></pre>
+
+      <h3>Forcing a truce (mini, onStart)</h3>
+      <pre><code><span class="c">onStart:</span>
+ally random randomOther
+log <span class="s">"The Gamemakers decree a truce between two tributes."</span></code></pre>
+    </section>
+
+    <footer>
+      Code Editor Reference · The Hunger Games — Event Simulator
+    </footer>
+  </div>
+</body>
+</html>
