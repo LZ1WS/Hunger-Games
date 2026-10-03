@@ -697,7 +697,7 @@ module.exports = { GLOBAL_EVENTS: [
   },
   {
     "id": "purple_noon",
-    "mode": "mixed",
+    "mode": "influence",
     "chance": 0.2,
     "weight": 8,
     "duration": {
@@ -735,70 +735,27 @@ module.exports = { GLOBAL_EVENTS: [
       "behaviors": [
         "drain"
       ],
+      "retaliate": true,
+      "explosion": 0,
       "weapons": [
         {
           "cat": "melee",
           "dmg": 1,
           "spd": 6
         }
-      ]
-    },
-    "replace": {
-      "day": [
-        {
-          "tpl": {
-            "en": "The monoliths begin to glow and {self} and {others} feel sick.",
-            "ru": "Монолиты начинают светится и {self} и {others} становится плохо."
-          },
-          "targets": [
-            1,
-            4
-          ],
-          "weight": 30,
-          "target": "random",
-          "fxSelf": {
-            "health": -10,
-            "energy": -10,
-            "morale": -10
-          },
-          "fxOther": {
-            "health": -10,
-            "energy": -10,
-            "morale": -10
-          }
-        }
       ],
-      "night": [
-        {
-          "tpl": {
-            "en": "The monoliths begin to glow and {self} and {others} feel sick.",
-            "ru": "Монолиты начинают светится и {self} и {others} становится плохо."
-          },
-          "targets": [
-            1,
-            4
-          ],
-          "weight": 30,
-          "target": "random",
-          "fxSelf": {
-            "health": -10,
-            "energy": -10,
-            "morale": -10
-          },
-          "fxOther": {
-            "health": -10,
-            "energy": -10,
-            "morale": -10
-          }
-        }
-      ]
+      "damageMult": 1
     },
+    "replace": {},
     "script": {
       "onStart": "if (Math.random() < 0.5) {\n  const n = rand(1, 3);                 // random group size between 1 and 3\n  const pool = state.tributes.filter(isAlive).slice();\n  const targets = [];\n  while (targets.length < n && pool.length) {\n    targets.push(pool.splice(rand(0, pool.length - 1), 1)[0]); // draw without repeats\n  }\n\n  for (const target of targets) {\n    add(target, \"health\", -100);            // 100 HP damage\n    log(target.name + \" was crushed by the Monolith!\");\n  }\n}",
       "onDay": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" feels sick from the glow of the Monoliths.\");\n}",
       "onNight": "const n = rand(1, 4);                       // random 1..4 tributes\nconst pool = state.tributes.filter(isAlive).slice();\nfor (let i = 0; i < n && pool.length; i++) {\n  const t = pool.splice(rand(0, pool.length - 1), 1)[0]; // no repeats\n  add(t, \"health\", -10);\n  add(t, \"energy\", -10);\n  add(t, \"morale\", -10);\n  log(t.name + \" feels sick from the glow of the Monoliths.\");\n}"
     },
-    "enabled": true
+    "enabled": true,
+    "maxTriggers": null,
+    "disable": null,
+    "addon": {}
   },
   {
     "id": "crimson_noon",
