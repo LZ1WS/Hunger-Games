@@ -286,8 +286,8 @@ function updateAbility(id, patch) {
   for (const k of ["damageDealt", "damageTaken", "coldResist", "scavengeChance", "targetWeight"]) {
     if (patch[k] !== undefined) a[k] = patch[k];
   }
-  if (patch.upkeep) a.upkeep = patch.upkeep;
-  if (patch.extraAction) a.extraAction = patch.extraAction;
+  if (patch.upkeep !== undefined) a.upkeep = patch.upkeep || null;
+  if (patch.extraAction !== undefined) a.extraAction = patch.extraAction || null;
   saveAbilitiesFile();
   return a;
 }
